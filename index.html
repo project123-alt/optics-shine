@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>缝隙间的光韵万象</title>
+    <link rel="stylesheet" href="css/all.min.css"> 
+    <script src="js/index.js"></script> 
+    <style>
+        /* ========== 全局重置与基础样式 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            width: 100vw;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            background: linear-gradient(135deg, #0a0e1f, #121828);
+        }
+
+        /* ========== Three.js 画布容器 ========== */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        /* ========== 导航栏 ========== */
+        .nav {
+            position: absolute;
+            top: 30px;
+            width: 100%;
+            z-index: 20;
+        }
+
+        .nav-center {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .nav-right {
+            position: absolute;
+            top: 0;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-item {
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: rgba(200, 220, 255, 0.8);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(156, 39, 176, 0.5);
+        }
+
+        .nav-item:hover {
+            color: #e0f0ff;
+            background: rgba(156, 39, 176, 0.2);
+            transform: translateY(-4px);
+            text-shadow: 0 0 8px rgba(100, 180, 255, 0.8);
+            border-color: rgba(156, 39, 176, 0.8);
+        }
+
+        .login-icon {
+            margin-right: 5px;
+        }
+
+        /* ========== 主体容器 ========== */
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+
+        /* ========== 主标题 ========== */
+        .main-title {
+            font-size: clamp(2.5rem, 5vw, 6rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #4fc3f7, #9c27b0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            text-shadow: 0 0 25px rgba(79, 195, 247, 0.6), 0 0 50px rgba(156, 39, 176, 0.4);
+            position: absolute;
+            top: 18%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            animation: glow 3s infinite ease-in-out;
+            line-height: 1.2;
+            text-align: center;
+        }
+
+        /* ========== 副标题（跳跃动画英文） ========== */
+        .sub-main-title {
+            font-family: "Times New Roman", Times, serif;
+            font-size: clamp(0.8rem, 1.5vw, 1.5rem);
+            font-weight: 800;
+            color: #fff;
+            position: absolute;
+            top: 26%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            text-align: center;
+            text-rendering: geometricPrecision;
+        }
+
+        .sub-main-title span {
+            display: inline-block;
+            animation: jump 3s infinite cubic-bezier(0.3, 0.2, 0.3, 1);
+            vertical-align: middle;
+        }
+
+        /* ========== 独立合集按钮（位于标题下方，PC端绝对定位） ========== */
+        .collection-wrapper {
+            position: absolute;
+            top: 34%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 15;
+            white-space: nowrap;
+        }
+        
+        /* 合集按钮基础样式：白色，无边框无背景 */
+        .collection-wrapper .nav-item {
+            display: inline-block;
+            padding: 8px 24px;
+            font-size: clamp(1.4rem, 2.0vw, 2.2rem);
+            font-weight: bold;
+            color: #ffffff;
+            background: transparent;
+            backdrop-filter: none;
+            border: none;
+            box-shadow: none;
+            border-radius: 0;
+            cursor: pointer;
+            text-shadow: none;
+            transition: all 0.3s ease;
+        }
+        
+        /* 合集按钮专属悬停效果：汉字微微扩大 + 发光（点击时不变化） */
+        #collection-nav {
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            display: inline-block;
+            transform-origin: center;
+            will-change: transform;
+        }
+        
+        #collection-nav:hover {
+            transform: scale(1.08);
+            text-shadow: 0 0 12px rgba(79, 195, 247, 0.9), 0 0 8px rgba(156, 39, 176, 0.8);
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            box-shadow: none;
+            backdrop-filter: none;
+        }
+        
+        /* 确保移动端触摸时悬停效果同样扩大发光 */
+        @media (max-width: 768px) {
+            #collection-nav:hover {
+                transform: scale(1.06);
+                text-shadow: 0 0 10px rgba(79, 195, 247, 0.9), 0 0 6px rgba(156, 39, 176, 0.8);
+            }
+        }
+
+        /* 保证其他悬停样式不会干扰合集按钮（覆盖原有冲突） */
+        .collection-wrapper .nav-item:hover {
+            background: transparent;
+            transform: none;
+            color: #ffffff;
+            border: none;
+            text-shadow: none;
+            box-shadow: none;
+            text-decoration: none;
+        }
+        
+        /* 使用更高权重确保悬停时我们的效果优先 */
+        #collection-nav:hover {
+            transform: scale(1.08) !important;
+            text-shadow: 0 0 12px rgba(79, 195, 247, 0.9), 0 0 8px rgba(156, 39, 176, 0.8) !important;
+            background: transparent !important;
+            border: none !important;
+        }
+
+        /* ========== 动画定义 ========== */
+        @keyframes jump {
+            0%, 100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-8px);
+                opacity: 1;
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                opacity: 0.9;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes diamondGlow {
+            0%, 100% {
+                box-shadow: 0 0 22px rgba(79, 195, 247, 0.25), inset 0 0 16px rgba(156, 39, 176, 0.15);
+            }
+            50% {
+                box-shadow: 0 0 32px rgba(79, 195, 247, 0.35), inset 0 0 22px rgba(156, 39, 176, 0.25);
+            }
+        }
+
+        @keyframes particleMove {
+            0% {
+                transform: translate(0, 0);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translate(100vw, -100vh);
+                opacity: 0;
+            }
+        }
+
+        /* ========== 菱形卡片（通用样式） ========== */
+        .diamond {
+            width: 220px;
+            height: 220px;
+            border: 1px solid rgba(100, 150, 255, 0.35);
+            transform: rotate(45deg) scale(1);
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 22px rgba(79, 195, 247, 0.25), inset 0 0 16px rgba(156, 39, 176, 0.15);
+            z-index: 5;
+            animation: diamondGlow 3.5s infinite ease-in-out;
+            border-radius: 20px;
+            cursor: default;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .diamond:hover {
+            cursor: pointer;
+            transform: rotate(45deg) scale(1.1);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 0 32px rgba(79, 195, 247, 0.35), inset 0 0 22px rgba(156, 39, 176, 0.25);
+            filter: brightness(1.02);
+        }
+
+        /* 五个菱形的定位（PC端） */
+        .diamond-basic {
+            bottom: 18%;
+            left: 8%;
+        }
+
+        .diamond-single {
+            bottom: 38%;
+            left: 25%;
+        }
+
+        .diamond-double {
+            bottom: 18%;
+            right: 42%;
+        }
+
+        .diamond-multi {
+            bottom: 38%;
+            right: 25%;
+        }
+
+        .diamond-other {
+            bottom: 18%;
+            right: 8%;
+        }
+
+        /* 菱形内部内容区域（反向旋转） */
+        .diamond-content {
+            transform: rotate(-45deg);
+            text-align: center;
+            color: #fff;
+            width: 85%;
+            height: 85%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+            padding-bottom: 40px;
+        }
+
+        .diamond:hover .diamond-content {
+            transform: rotate(-45deg) scale(1.05);
+        }
+
+        .diamond-subtitle {
+            font-size: clamp(1.4rem, 2.0vw, 2.2rem);
+            color: #4fc3f7;
+            text-shadow: 0 0 9px rgba(79, 195, 247, 0.6);
+            line-height: 1.2;
+            margin: 0;
+            flex-shrink: 0;
+        }
+
+        .diamond-desc {
+            font-size: clamp(0.9rem, 1.6vw, 1.0rem);
+            color: #e0e0e0;
+            line-height: 1.5;
+            margin: 0;
+            width: 90%;
+            max-height: 60%;
+            text-align: center;
+            padding: 0 8px;
+            overflow: hidden;
+            flex-shrink: 1;
+        }
+
+        /* 详情按钮（悬浮出现） */
+        .more-info {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translate(-50%, 15px);
+            font-size: 14px;
+            color: #ccc;
+            font-weight: 400;
+            line-height: 1.4;
+            opacity: 0;
+            user-select: none;
+            z-index: 2;
+            transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+            cursor: pointer;
+        }
+
+        .more-info::after {
+            content: "";
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-top: 1px solid #ccc;
+            border-right: 1px solid #ccc;
+            transform: rotate(45deg);
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        .diamond:hover .more-info {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        /* ========== 背景粒子 ========== */
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #fff;
+            border-radius: 50%;
+            animation: particleMove 12s infinite linear;
+            opacity: 0.7;
+        }
+
+        /* ========== 页脚版权 ========== */
+        .footer-copyright {
+            position: fixed;
+            bottom: 20px;
+            left: 30px;
+            z-index: 30;
+            color: #ccc;
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 5px rgba(79, 195, 247, 0.2);
+        }
+
+        /* ========== 通用弹窗样式 ========== */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        /* 联系我们卡片 */
+        .contact-card {
+            position: relative;
+            background: #121828;
+            padding: 40px 50px;
+            border-radius: 12px;
+            border: 1px solid rgba(156, 39, 176, 0.3);
+            min-width: 400px;
+            box-shadow: 0 0 30px rgba(79, 195, 247, 0.15);
+        }
+
+        .contact-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+        }
+
+        .contact-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(79, 195, 247, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #4fc3f7;
+            font-size: 18px;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .contact-label {
+            font-size: 16px;
+            color: #ccc;
+            font-weight: 50;
+        }
+
+        .contact-value {
+            font-size: 18px;
+            color: #fff;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #ccc;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+
+        .close-btn:hover {
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        /* 登录弹窗 */
+        .login-modal {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(3px);
+        }
+
+        .login-card {
+            background: #0f172a;
+            padding: 40px 50px;
+            border-radius: 8px;
+            min-width: 400px;
+            position: relative;
+        }
+
+        .login-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .login-tip {
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 25px;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 16px;
+            color: #e0e0e0;
+        }
+
+        .form-input {
+            height: 45px;
+            padding: 0 15px;
+            border: 1px solid #2d3748;
+            background: #1e293b;
+            color: #fff;
+            border-radius: 4px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: #9c27b0;
+            background: #273449;
+        }
+
+        .form-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .login-btn {
+            height: 50px;
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .login-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 20px;
+            color: #ccc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-close:hover {
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        /* 通用子弹窗卡片（单缝/双缝/多缝/拓展） */
+        .single-slit-card {
+            position: relative;
+            background: #121828;
+            padding: 40px 50px;
+            border-radius: 12px;
+            border: 1px solid rgba(156, 39, 176, 0.3);
+            min-width: 400px;
+            box-shadow: 0 0 30px rgba(79, 195, 247, 0.15);
+        }
+
+        .single-slit-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+        }
+
+        .single-slit-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .single-slit-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .single-slit-item:hover {
+            transform: translateX(5px);
+        }
+
+        .single-slit-value {
+            font-size: 24px;
+            color: #fff;
+            position: relative;
+            padding: 12px 24px;
+            background-color: #1e293b;
+            border-radius: 8px;
+            border: 4px solid #1e293b;
+            transition: all 0.3s ease;
+        }
+
+        .single-slit-value:hover {
+            color: #fff;
+            background-color: #273449;
+            border: 4px solid #273449;
+        }
+
+        /* ========== 移动端适配 ========== */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                padding-top: 20px;
+                padding-bottom: 100px;
+            }
+
+            .main-title {
+                position: relative;
+                top: auto;
+                left: auto;
+                transform: none;
+                margin: 20px 0 10px 0;
+                width: 100%;
+                text-align: center;
+                font-size: clamp(2rem, 8vw, 3.5rem);
+            }
+
+            .sub-main-title {
+                position: relative;
+                top: auto;
+                left: auto;
+                transform: none;
+                margin: 0 0 20px 0;
+                width: 100%;
+                font-size: clamp(0.7rem, 3vw, 1.1rem);
+                text-align: center;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            /* 移动端合集按钮布局调整，样式继承PC端无边框无背景样式 */
+            .collection-wrapper {
+                position: relative;
+                top: auto;
+                left: auto;
+                transform: none;
+                margin: 0 auto 25px auto;
+                text-align: center;
+                width: fit-content;
+                z-index: 12;
+            }
+            
+            .collection-wrapper .nav-item {
+                padding: 8px 24px;
+                font-size: clamp(1.3rem, 4vw, 2rem);
+                font-weight: bold;
+                color: #ffffff;
+                background: transparent;
+                backdrop-filter: none;
+                border: none;
+                box-shadow: none;
+                border-radius: 0;
+                transition: all 0.3s ease;
+            }
+            
+            /* 移动端合集悬停效果也保持扩大发光（点击不变化） */
+            #collection-nav:hover {
+                transform: scale(1.06);
+                text-shadow: 0 0 10px rgba(79, 195, 247, 0.9), 0 0 6px rgba(156, 39, 176, 0.8);
+            }
+            
+            .collection-wrapper .nav-item:hover {
+                background: transparent;
+                transform: none;
+                color: #ffffff;
+            }
+
+            .nav {
+                position: relative;
+                top: auto;
+                width: 100%;
+                margin: 0 0 20px 0;
+                background: transparent;
+            }
+
+            .nav-center {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+
+            .nav-right {
+                position: relative;
+                top: auto;
+                right: auto;
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin-top: 0;
+            }
+
+            .nav-item {
+                padding: 6px 12px;
+                font-size: 0.85rem;
+                white-space: nowrap;
+            }
+
+            .diamond {
+                position: relative;
+                width: 160px;
+                height: 160px;
+                margin: 35px auto;
+                left: auto;
+                right: auto;
+                bottom: auto;
+                top: auto;
+                transform: rotate(45deg);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .diamond-basic,
+            .diamond-single,
+            .diamond-double,
+            .diamond-multi,
+            .diamond-other {
+                position: relative;
+                left: auto;
+                right: auto;
+                bottom: auto;
+                top: auto;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .diamond + .diamond {
+                margin-top: 35px;
+            }
+
+            .diamond-content {
+                gap: 6px;
+                padding-bottom: 25px;
+            }
+
+            .diamond-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .diamond-desc {
+                font-size: 0.7rem;
+                line-height: 1.3;
+            }
+
+            .more-info {
+                font-size: 10px;
+                bottom: 8px;
+            }
+
+            .footer-copyright {
+                left: 50%;
+                transform: translateX(-50%);
+                bottom: 12px;
+                font-size: 10px;
+                white-space: nowrap;
+                text-align: center;
+            }
+
+            .contact-card,
+            .login-card,
+            .single-slit-card {
+                min-width: auto;
+                width: 90vw;
+                max-width: 400px;
+                padding: 25px 20px;
+            }
+
+            .close-btn,
+            .login-close {
+                top: 12px;
+                right: 12px;
+                font-size: 20px;
+            }
+
+            .single-slit-value {
+                font-size: 18px;
+                padding: 8px 16px;
+            }
+
+            .contact-title,
+            .single-slit-title {
+                font-size: 22px;
+                margin-bottom: 20px;
+            }
+
+            .contact-item {
+                gap: 12px;
+            }
+
+            .contact-icon {
+                width: 34px;
+                height: 34px;
+                font-size: 16px;
+            }
+
+            .contact-value {
+                font-size: 14px;
+            }
+
+            .login-title {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+
+    <!-- 导航栏 -->
+    <div class="nav">
+        <div class="nav-center">
+            <div class="nav-item" id="home-nav">首页</div>
+            <div class="nav-item" id="experiment-intro">实验介绍</div>
+            <div class="nav-item" id="contact-us">联系我们</div>
+        </div>
+        <div class="nav-right">
+            <div class="nav-item" id="login-btn"><span class="login-icon">👤</span>登录</div>
+        </div>
+    </div>
+
+    <!-- 主体容器 -->
+    <div class="container">
+        <h1 class="main-title">缝隙间的光韵万象</h1>
+        <h2 class="sub-main-title" id="subTitle"></h2>
+        
+        <!-- 合集按钮：点击跳转至 main/box.html，鼠标悬停时汉字微微扩大并发光，点击时无样式变化 -->
+        <div class="collection-wrapper">
+            <div class="nav-item" id="collection-nav">合集</div>
+        </div>
+
+        <div class="diamond diamond-basic">
+            <div class="diamond-content">
+                <h3 class="diamond-subtitle">-基础知识-</h3>
+                <p class="diamond-desc">干涉、衍射定义<br>相干光分类<br>光源类型等</p>
+                <div class="more-info" id="basic-more-info">了解详情</div>
+            </div>
+        </div>
+
+        <div class="diamond diamond-single">
+            <div class="diamond-content">
+                <h3 class="diamond-subtitle">-单缝衍射-</h3>
+                <p class="diamond-desc">夫琅禾费单缝衍射<br>中央亮纹极强<br>次级亮纹衰减等</p>
+                <div class="more-info" id="single-more-info">了解详情</div>
+            </div>
+        </div>
+
+        <div class="diamond diamond-double">
+            <div class="diamond-content">
+                <h3 class="diamond-subtitle">-双缝干涉-</h3>
+                <p class="diamond-desc">杨氏双缝干涉<br>两束相干光叠加<br>条纹等间距明暗等</p>
+                <div class="more-info" id="double-more-info">了解详情</div>
+            </div>
+        </div>
+
+        <div class="diamond diamond-multi">
+            <div class="diamond-content">
+                <h3 class="diamond-subtitle">-多缝万象-</h3>
+                <p class="diamond-desc">多缝夫琅禾费衍射<br>主极大锐细<br>存在次极大和缺级等</p>
+                <div class="more-info" id="multi-more-info">了解详情</div>
+            </div>
+        </div>
+
+        <div class="diamond diamond-other">
+            <div class="diamond-content">
+                <h3 class="diamond-subtitle">-拓展实验-</h3>
+                <p class="diamond-desc">呈现环纹与矩形条纹<br>光强明暗周期性变化<br>自定义孔径衍射等</p>
+                <div class="more-info" id="other-more-info">了解详情</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-copyright">©2026 缝隙间的光韵万象 | 光学科普平台</div>
+
+    <!-- 联系我们弹窗 -->
+    <div class="modal" id="contact-modal">
+        <div class="contact-card">
+            <i class="fa-solid fa-xmark close-btn" id="close-contact"></i>
+            <h2 class="contact-title">联系方式</h2>
+            <ul class="contact-list">
+                <li class="contact-item">
+                    <div class="contact-icon"><i class="fa-solid fa-envelope"></i></div>
+                    <div class="contact-info">
+                        <div class="contact-label">邮箱</div>
+                        <div class="contact-value">2604207854@qq.com</div>
+                    </div>
+                </li>
+                <li class="contact-item">
+                    <div class="contact-icon"><i class="fa-solid fa-phone"></i></div>
+                    <div class="contact-info">
+                        <div class="contact-label">电话</div>
+                        <div class="contact-value">+86 17861337708</div>
+                    </div>
+                </li>
+                <li class="contact-item">
+                    <div class="contact-icon"><i class="fa-solid fa-location-dot"></i></div>
+                    <div class="contact-info">
+                        <div class="contact-label">地址</div>
+                        <div class="contact-value">山东省济宁市</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 单缝衍射弹窗 -->
+    <div class="modal" id="single-slit-modal">
+        <div class="single-slit-card">
+            <i class="fa-solid fa-xmark close-btn" id="close-single-slit"></i>
+            <h2 class="single-slit-title">单缝衍射</h2>
+            <ul class="single-slit-list">
+                <li class="single-slit-item" id="fraunhofer-diffraction">
+                    <div class="single-slit-value">夫琅禾费单缝衍射</div>
+                </li>
+                <li class="single-slit-item" id="single-electron-diffraction">
+                    <div class="single-slit-value">单电子单缝衍射</div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 双缝干涉弹窗 -->
+    <div class="modal" id="double-slit-modal">
+        <div class="single-slit-card">
+            <i class="fa-solid fa-xmark close-btn" id="close-double-slit"></i>
+            <h2 class="single-slit-title">双缝干涉</h2>
+            <ul class="single-slit-list">
+                <li class="single-slit-item" id="young-double-slit">
+                    <div class="single-slit-value">杨氏双缝干涉</div>
+                </li>
+                <li class="single-slit-item" id="electron-double-slit">
+                    <div class="single-slit-value">电子双缝干涉</div>
+                </li>
+                <li class="single-slit-item" id="aharonov-bohm-effect">
+                    <div class="single-slit-value">阿哈罗诺夫-玻姆效应</div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 多缝衍射弹窗 -->
+    <div class="modal" id="multi-slit-modal">
+        <div class="single-slit-card">
+            <i class="fa-solid fa-xmark close-btn" id="close-multi-slit"></i>
+            <h2 class="single-slit-title">多缝衍射</h2>
+            <ul class="single-slit-list">
+                <li class="single-slit-item" id="xray-diffraction">
+                    <div class="single-slit-value">X射线衍射</div>
+                </li>
+                <li class="single-slit-item" id="multi-fraunhofer-diffraction">
+                    <div class="single-slit-value">夫琅禾费多缝衍射</div>
+                </li>
+                 <li class="single-slit-item" id="reflection-grating-diffraction">
+                    <div class="single-slit-value">反射光栅衍射</div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 拓展实验弹窗 -->
+    <div class="modal" id="other-modal">
+        <div class="single-slit-card">
+            <i class="fa-solid fa-xmark close-btn" id="close-other"></i>
+            <h2 class="single-slit-title">拓展实验</h2>
+            <ul class="single-slit-list">
+                <li class="single-slit-item" id="rectangular-aperture">
+                    <div class="single-slit-value">夫琅禾费矩形孔衍射</div>
+                </li>
+                <li class="single-slit-item" id="polygonal-aperture">
+                    <div class="single-slit-value">光的偏振</div>
+                </li>
+                <li class="single-slit-item" id="arbitrary-aperture">
+                    <div class="single-slit-value">牛顿环干涉</div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 登录弹窗 -->
+    <div class="modal login-modal" id="login-modal">
+        <div class="login-card">
+            <i class="fa-solid fa-xmark login-close" id="close-login"></i>
+            <h2 class="login-title">登录</h2>
+            <p class="login-tip">提示：账号和密码均为学号</p>
+            <form class="login-form" id="login-form">
+                <div class="form-item">
+                    <label class="form-label">账号:</label>
+                    <input type="text" class="form-input" id="login-account" placeholder="请输入学号">
+                </div>
+                <div class="form-item">
+                    <label class="form-label">密码:</label>
+                    <input type="password" class="form-input" id="login-pwd" placeholder="请输入学号">
+                </div>
+                <button type="button" class="login-btn" id="do-login">登录</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        // ======================== Three.js 星空粒子系统 ========================
+        const containerEl = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0e1f);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 120;
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        containerEl.appendChild(renderer.domElement);
+
+        let particlesGroup = null;
+
+        function createParticleSystem() {
+            const group = new THREE.Group();
+            const sphereGeo = new THREE.SphereGeometry(0.235, 8, 6);
+            const hueArray = [0.6, 0.65, 0.7, 0.75, 0.8];
+            const materials = hueArray.map(hue => new THREE.MeshBasicMaterial({
+                color: new THREE.Color().setHSL(hue, 0.9, 0.6),
+                transparent: true,
+                opacity: 0.7
+            }));
+
+            for (let i = 0; i < 1000; i++) {
+                const randomMat = materials[Math.floor(Math.random() * materials.length)];
+                const mesh = new THREE.Mesh(sphereGeo, randomMat);
+                const radius = 30 + Math.random() * 70;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                mesh.position.x = radius * Math.sin(phi) * Math.cos(theta);
+                mesh.position.y = radius * Math.sin(phi) * Math.sin(theta);
+                mesh.position.z = radius * Math.cos(phi);
+                mesh.scale.set(0.55 + Math.random() * 0.05, 0.55 + Math.random() * 0.05, 0.55 + Math.random() * 0.05);
+                group.add(mesh);
+            }
+            return group;
+        }
+
+        function initThreeScene() {
+            if (particlesGroup) {
+                scene.remove(particlesGroup);
+                particlesGroup.children.forEach(child => {
+                    if (child.geometry) child.geometry.dispose();
+                    if (child.material) child.material.dispose();
+                });
+            }
+            particlesGroup = createParticleSystem();
+            scene.add(particlesGroup);
+        }
+
+        function initSubtitleAnimation() {
+            const text = "Optical Luminous Aura Myriads Through Crevices";
+            let html = '';
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i] === ' ' ? '&nbsp;' : text[i];
+                html += `<span style="animation-delay:${i * 0.06}s">${char}</span>`;
+            }
+            document.getElementById('subTitle').innerHTML = html;
+        }
+
+        function createFloatingParticles() {
+            const containerDiv = document.querySelector('.container');
+            const durations = [8, 11, 9, 10, 7, 12, 8.5, 10.5, 9.5, 11.5];
+            const positions = [[10, 20], [30, 80], [50, 40], [70, 60], [90, 10], [20, 90], [40, 30], [60, 70], [80, 50], [5, 95]];
+            durations.forEach((dur, idx) => {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.top = `${positions[idx][0]}%`;
+                particle.style.left = `${positions[idx][1]}%`;
+                particle.style.animationDuration = `${dur}s`;
+                containerDiv.appendChild(particle);
+            });
+        }
+
+        function animateScene() {
+            requestAnimationFrame(animateScene);
+            const time = Date.now() * 0.0005;
+            if (particlesGroup) {
+                particlesGroup.rotation.y += 0.003;
+                particlesGroup.children.forEach((child, idx) => {
+                    child.position.z += Math.sin(time + idx * 0.02) * 0.08;
+                    if (child.position.z > 100) child.position.z -= 200;
+                    else if (child.position.z < -100) child.position.z += 200;
+                });
+            }
+            renderer.render(scene, camera);
+        }
+
+        function visualFeedback(elementId) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                el.style.background = 'rgba(156, 39, 176, 0.3)';
+                setTimeout(() => {
+                    if (el) el.style.background = '';
+                }, 200);
+            }
+        }
+
+        function bindAllEvents() {
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            const otherModal = document.getElementById('other-modal');
+
+            document.getElementById('home-nav').onclick = () => {
+                initThreeScene();
+                document.getElementById('contact-modal').style.display = 'none';
+                document.getElementById('login-modal').style.display = 'none';
+                document.getElementById('single-slit-modal').style.display = 'none';
+                document.getElementById('double-slit-modal').style.display = 'none';
+                document.getElementById('multi-slit-modal').style.display = 'none';
+                if (otherModal) otherModal.style.display = 'none';
+                visualFeedback('home-nav');
+            };
+
+            document.getElementById('experiment-intro').onclick = () => {
+                document.getElementById('contact-modal').style.display = 'none';
+                document.getElementById('login-modal').style.display = 'none';
+                document.getElementById('single-slit-modal').style.display = 'none';
+                document.getElementById('double-slit-modal').style.display = 'none';
+                document.getElementById('multi-slit-modal').style.display = 'none';
+                if (otherModal) otherModal.style.display = 'none';
+                window.open('pdf/实验介绍.pdf', '_blank');
+                visualFeedback('experiment-intro');
+            };
+
+            document.getElementById('contact-us').onclick = () => {
+                document.getElementById('login-modal').style.display = 'none';
+                document.getElementById('single-slit-modal').style.display = 'none';
+                document.getElementById('double-slit-modal').style.display = 'none';
+                document.getElementById('multi-slit-modal').style.display = 'none';
+                if (otherModal) otherModal.style.display = 'none';
+                document.getElementById('contact-modal').style.display = 'flex';
+                visualFeedback('contact-us');
+            };
+            document.getElementById('close-contact').onclick = () => document.getElementById('contact-modal').style.display = 'none';
+            document.getElementById('contact-modal').onclick = (e) => {
+                if (e.target === document.getElementById('contact-modal')) document.getElementById('contact-modal').style.display = 'none';
+            };
+
+            document.getElementById('login-btn').onclick = () => {
+                document.getElementById('contact-modal').style.display = 'none';
+                document.getElementById('single-slit-modal').style.display = 'none';
+                document.getElementById('double-slit-modal').style.display = 'none';
+                document.getElementById('multi-slit-modal').style.display = 'none';
+                if (otherModal) otherModal.style.display = 'none';
+                document.getElementById('login-modal').style.display = 'flex';
+                visualFeedback('login-btn');
+            };
+            document.getElementById('close-login').onclick = () => document.getElementById('login-modal').style.display = 'none';
+            document.getElementById('login-modal').onclick = (e) => {
+                if (e.target === document.getElementById('login-modal')) document.getElementById('login-modal').style.display = 'none';
+            };
+            document.getElementById('do-login').onclick = () => {
+                const account = document.getElementById('login-account').value.trim();
+                const pwd = document.getElementById('login-pwd').value.trim();
+                if (!account || !pwd) {
+                    alert('请输入学号作为账号和密码！');
+                } else if (account === pwd) {
+                    alert(`登录成功！欢迎你，${account}同学`);
+                    document.getElementById('login-modal').style.display = 'none';
+                } else {
+                    alert('账号和密码不一致，请输入学号作为账号和密码！');
+                }
+            };
+
+            // 合集按钮：点击跳转到 main 文件夹下的 box.html
+            const collectionBtn = document.getElementById('collection-nav');
+            if (collectionBtn) {
+                collectionBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    window.location.href = 'main/box.html';
+                };
+            }
+
+            document.getElementById('basic-more-info').onclick = () => {
+                window.location.href = 'main/基础知识.html';
+            };
+
+            const singleMoreBtn = document.getElementById('single-more-info');
+            const singleModal = document.getElementById('single-slit-modal');
+            singleMoreBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                visualFeedback('single-more-info');
+                document.getElementById('contact-modal').style.display = 'none';
+                document.getElementById('login-modal').style.display = 'none';
+                document.getElementById('double-slit-modal').style.display = 'none';
+                document.getElementById('multi-slit-modal').style.display = 'none';
+                if (otherModal) otherModal.style.display = 'none';
+                singleModal.style.display = 'flex';
+            });
+            document.getElementById('close-single-slit').onclick = () => singleModal.style.display = 'none';
+            singleModal.onclick = (e) => { if (e.target === singleModal) singleModal.style.display = 'none'; };
+            document.getElementById('fraunhofer-diffraction').addEventListener('click', () => window.location.href = 'main/夫琅禾费单缝衍射实验.html');
+            document.getElementById('single-electron-diffraction').addEventListener('click', () => window.location.href = 'main/单电子单缝衍射实验.html');
+
+            const doubleMoreBtn = document.getElementById('double-more-info');
+            const doubleModal = document.getElementById('double-slit-modal');
+            doubleMoreBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                visualFeedback('double-more-info');
+                document.getElementById('contact-modal').style.display = 'none';
+                document.getElementById('login-modal').style.display = 'none';
+                document.getElementById('single-slit-modal').style.display = 'none';
+                document.getElementById('multi-slit-modal').style.display = 'none';
+                if (otherModal) otherModal.style.display = 'none';
+                doubleModal.style.display = 'flex';
+            });
+            document.getElementById('close-double-slit').onclick = () => doubleModal.style.display = 'none';
+            doubleModal.onclick = (e) => { if (e.target === doubleModal) doubleModal.style.display = 'none'; };
+            document.getElementById('young-double-slit').addEventListener('click', () => window.location.href = 'main/杨氏双缝干涉实验.html');
+            document.getElementById('electron-double-slit').addEventListener('click', () => window.location.href = 'main/电子双缝干涉实验.html');
+            
+            // 阿哈罗诺夫-玻姆效应：跳转到电子双缝干涉实验页面并定位到对应锚点
+            const abEffectItem = document.getElementById('aharonov-bohm-effect');
+            if (abEffectItem) {
+                abEffectItem.addEventListener('click', () => {
+                    window.location.href = 'main/电子双缝干涉实验.html#实验原理（A-B效应）';
+                });
+            }
+
+            const multiMoreBtn = document.getElementById('multi-more-info');
+            const multiModal = document.getElementById('multi-slit-modal');
+            multiMoreBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                visualFeedback('multi-more-info');
+                document.getElementById('contact-modal').style.display = 'none';
+                document.getElementById('login-modal').style.display = 'none';
+                document.getElementById('single-slit-modal').style.display = 'none';
+                document.getElementById('double-slit-modal').style.display = 'none';
+                if (otherModal) otherModal.style.display = 'none';
+                multiModal.style.display = 'flex';
+            });
+            document.getElementById('close-multi-slit').onclick = () => multiModal.style.display = 'none';
+            multiModal.onclick = (e) => { if (e.target === multiModal) multiModal.style.display = 'none'; };
+            document.getElementById('xray-diffraction').addEventListener('click', () => window.location.href = 'main/X射线衍射实验.html');
+            document.getElementById('multi-fraunhofer-diffraction').addEventListener('click', () => window.location.href = 'main/夫琅禾费多缝衍射实验.html');
+            
+            // ==================== 关键修改：反射光栅衍射跳转到夫琅禾费多缝衍射实验.html中的反射光栅仿真区域 ====================
+            const reflectionGratingItem = document.getElementById('reflection-grating-diffraction');
+            if (reflectionGratingItem) {
+                reflectionGratingItem.addEventListener('click', () => {
+                    // 跳转到目标页面并定位到已有锚点“实验仿真仿真（反射光栅）”
+                    window.location.href = 'main/夫琅禾费多缝衍射实验.html#实验仿真仿真（反射光栅）';
+                });
+            }
+
+            const otherMoreBtn = document.getElementById('other-more-info');
+            if (otherMoreBtn) {
+                otherMoreBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    visualFeedback('other-more-info');
+                    document.getElementById('contact-modal').style.display = 'none';
+                    document.getElementById('login-modal').style.display = 'none';
+                    document.getElementById('single-slit-modal').style.display = 'none';
+                    document.getElementById('double-slit-modal').style.display = 'none';
+                    document.getElementById('multi-slit-modal').style.display = 'none';
+                    if (otherModal) otherModal.style.display = 'flex';
+                });
+            }
+            if (document.getElementById('close-other')) {
+                document.getElementById('close-other').onclick = () => otherModal.style.display = 'none';
+            }
+            if (otherModal) {
+                otherModal.onclick = (e) => { if (e.target === otherModal) otherModal.style.display = 'none'; };
+            }
+            const rectangularAperture = document.getElementById('rectangular-aperture');
+            if (rectangularAperture) rectangularAperture.addEventListener('click', () => window.location.href = 'main/夫琅禾费矩形孔衍射实验.html');
+            const polygonalAperture = document.getElementById('polygonal-aperture');
+            if (polygonalAperture) polygonalAperture.addEventListener('click', () => window.location.href = 'main/光的偏振实验.html');
+            const arbitraryAperture = document.getElementById('arbitrary-aperture');
+            if (arbitraryAperture) arbitraryAperture.addEventListener('click', () => window.location.href = 'main/牛顿环干涉实验.html');
+        }
+
+        initThreeScene();
+        initSubtitleAnimation();
+        createFloatingParticles();
+        bindAllEvents();
+        animateScene();
+    </script>
+</body>
+</html>
