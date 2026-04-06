@@ -1,0 +1,2028 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>单电子单缝衍射实验</title>
+
+<!-- 添加MathJax支持 -->
+ <script id="MathJax-script" async 
+src="../es5/tex-mml-svg.js"></script>
+<link rel="stylesheet" href="../css/all.min.css">
+
+<style>
+/* ========== 原有全局样式（保留不变，仅修改加粗相关） ========== */
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+}
+
+body {
+background:
+radial-gradient(circle at 10% 20%, rgba(20, 30, 80, 0.8) 0%, transparent 30%),
+radial-gradient(circle at 90% 30%, rgba(40, 20, 90, 0.7) 0%, transparent 40%),
+radial-gradient(circle at 50% 80%, rgba(30, 40, 100, 0.6) 0%, transparent 35%),
+linear-gradient(to bottom, #0a0e2a, #1a1f3a, #2d3250);
+color: #e0e0ff;
+line-height: 1.6;
+min-height: 100vh;
+background-attachment: fixed;
+position: relative;
+overflow-x: hidden;
+animation: skyMove 30s infinite alternate ease-in-out;
+padding-top: 70px;
+}
+
+@keyframes skyMove {
+0% {
+background-position: 0% 0%, 100% 0%, 50% 100%;
+}
+100% {
+background-position: 10% 20%, 90% 30%, 50% 80%;
+}
+}
+
+body::before {
+content: '';
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-image:
+radial-gradient(2px 2px at 20px 30px, #eee, transparent),
+radial-gradient(2px 2px at 40px 70px, #fff, transparent),
+radial-gradient(3px 3px at 120px 180px, #ddd, transparent),
+radial-gradient(2px 2px at 200px 150px, #fff, transparent),
+radial-gradient(1px 1px at 300px 80px, #eee, transparent),
+radial-gradient(2px 2px at 350px 200px, #ddd, transparent),
+radial-gradient(3px 3px at 450px 120px, #fff, transparent),
+radial-gradient(1px 1px at 500px 250px, #eee, transparent),
+radial-gradient(2px 2px at 600px 100px, #ddd, transparent);
+background-repeat: repeat;
+z-index: -1;
+animation:
+twinkle 8s infinite alternate,
+starsMove 20s infinite linear;
+opacity: 0.7;
+}
+
+body::after {
+content: '';
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-image:
+radial-gradient(1px 1px at 80px 120px, #bbf, transparent),
+radial-gradient(2px 2px at 150px 200px, #ccf, transparent),
+radial-gradient(1px 1px at 250px 80px, #aaf, transparent),
+radial-gradient(2px 2px at 320px 280px, #ddf, transparent),
+radial-gradient(1px 1px at 420px 150px, #bbf, transparent),
+radial-gradient(2px 2px at 500px 320px, #ccf, transparent);
+background-repeat: repeat;
+z-index: -1;
+animation:
+twinkle2 5s infinite alternate,
+starsMove2 25s infinite linear reverse;
+opacity: 0.5;
+}
+
+@keyframes twinkle {
+0%, 100% { opacity: 0.5; }
+50% { opacity: 0.9; }
+}
+
+@keyframes twinkle2 {
+0%, 100% { opacity: 0.3; }
+50% { opacity: 0.7; }
+}
+
+@keyframes starsMove {
+0% {
+background-position: 0px 0px;
+}
+100% {
+background-position: 200px 100px;
+}
+}
+
+@keyframes starsMove2 {
+0% {
+background-position: 0px 0px;
+}
+100% {
+background-position: -150px -80px;
+}
+}
+
+.star-particle {
+position: fixed;
+width: 2px;
+height: 2px;
+background-color: white;
+border-radius: 50%;
+box-shadow: 0 0 5px 1px rgba(255, 255, 255, 0.8);
+z-index: -1;
+opacity: 0;
+}
+
+.main-container {
+max-width: 1200px;
+margin: 0 auto;
+padding: 20px;
+position: relative;
+z-index: 1;
+}
+
+.nav-container {
+background-color: rgba(20, 25, 50, 0.95);
+border-radius: 0 0 12px 12px;
+padding: 15px 30px;
+backdrop-filter: blur(15px);
+border: 1px solid rgba(255, 255, 255, 0.1);
+border-top: none;
+box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+z-index: 1000;
+animation: navFloat 8s ease-in-out infinite;
+}
+
+@keyframes navFloat {
+0%, 100% { transform: translateY(0px); }
+50% { transform: translateY(-3px); }
+}
+
+.nav-list {
+display: flex;
+justify-content: center;
+list-style: none;
+flex-wrap: wrap;
+gap: 15px;
+}
+
+.nav-item {
+padding: 10px 20px;
+border-radius: 8px;
+cursor: pointer;
+transition: all 0.3s ease;
+font-weight: 600;
+display: flex;
+align-items: center;
+background: linear-gradient(135deg, rgba(63, 81, 181, 0.3), rgba(30, 34, 60, 0.8));
+border: 1px solid rgba(100, 120, 255, 0.3);
+}
+
+.nav-item:hover {
+background: linear-gradient(135deg, rgba(80, 100, 220, 0.5), rgba(50, 54, 85, 0.9));
+transform: translateY(-3px);
+border-color: rgba(100, 120, 255, 0.6);
+box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+.nav-item.active {
+background: linear-gradient(135deg, rgba(63, 81, 181, 0.7), rgba(40, 45, 80, 0.9));
+border-color: rgba(100, 120, 255, 0.8);
+}
+
+.nav-dot {
+width: 12px;
+height: 12px;
+border-radius: 50%;
+margin-right: 10px;
+}
+
+.nav-item:nth-child(1) .nav-dot { background-color: #ffcc00; }
+.nav-item:nth-child(2) .nav-dot { background-color: #4caf50; }
+.nav-item:nth-child(3) .nav-dot { background-color: #66ccff; }
+.nav-item:nth-child(4) .nav-dot { background-color: #ff6b6b; }
+/* 新增返回首页导航点颜色 */
+.nav-item:nth-child(5) .nav-dot { background-color: #bf2ee7; }
+
+.main-title {
+text-align: center;
+font-size: 2.8rem;
+color: #ffffff;
+margin-bottom: 30px;
+padding-bottom: 15px;
+border-bottom: 2px solid #3f51b5;
+text-shadow: 0 0 15px rgba(63, 81, 181, 0.7);
+letter-spacing: 1px;
+animation: titleGlow 4s ease-in-out infinite;
+font-weight: 700;
+}
+
+@keyframes titleGlow {
+0%, 100% { text-shadow: 0 0 15px rgba(63, 81, 181, 0.7); }
+50% { text-shadow: 0 0 25px rgba(63, 81, 181, 0.9), 0 0 35px rgba(63, 81, 181, 0.6); }
+}
+
+.content-section {
+background-color: rgba(255, 255, 255, 0.08);
+border-radius: 15px;
+padding: 30px;
+backdrop-filter: blur(10px);
+border: 1px solid rgba(255, 255, 255, 0.15);
+margin-bottom: 40px;
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+transition: transform 0.3s ease;
+}
+
+.content-section:hover {
+transform: translateY(-3px);
+box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+}
+
+/* 修改：所有章节标题左对齐，取消居中 */
+.section-title {
+font-size: 2.2rem;
+color: #ffffff;
+margin-bottom: 25px;
+padding-bottom: 15px;
+border-bottom: 2px solid #3f51b5;
+text-shadow: 0 0 10px rgba(63, 81, 181, 0.5);
+font-weight: 600;
+text-align: left; /* 原为 center，改为 left */
+}
+
+.definition-four-columns {
+display: flex;
+flex-wrap: wrap;
+gap: 20px;
+margin-bottom: 20px;
+}
+
+.definition-column {
+flex: 1;
+min-width: 250px;
+background: linear-gradient(135deg, rgba(30, 35, 60, 0.9), rgba(20, 25, 50, 0.8));
+padding: 20px;
+border-radius: 12px;
+box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+display: flex;
+flex-direction: column;
+transition: transform 0.3s ease;
+border: 1px solid rgba(63, 81, 181, 0.2);
+}
+
+.definition-column:hover {
+transform: translateY(-5px);
+box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+border-color: rgba(63, 81, 181, 0.4);
+}
+
+.definition-title {
+font-size: 1.4rem;
+color: #ffffff;
+margin-bottom: 15px;
+border-left: 4px solid #3f51b5;
+padding-left: 12px;
+font-weight: 600;
+}
+
+.definition-content {
+color: #d0d5ff;
+line-height: 1.7;
+flex-grow: 1;
+font-size: 1.08rem;
+}
+
+.principle-layout, .operation-layout {
+position: relative;
+}
+
+.detail-text {
+font-size: 1.1rem;
+line-height: 1.8;
+color: #d0d5ff;
+text-align: left; /* 确保文本左对齐 */
+}
+
+.detail-text h3 {
+color: #ffffff;
+margin: 25px 0 15px;
+font-size: 1.5rem;
+border-left: 4px solid #3f51b5;
+padding-left: 15px;
+font-weight: 600;
+}
+
+.detail-text h3:first-of-type {
+clear: none;
+margin-top: 0;
+}
+
+.detail-text p {
+margin-bottom: 18px;
+}
+
+.detail-text ul, .detail-text ol {
+margin-left: 20px;
+margin-bottom: 20px;
+}
+
+.detail-text li {
+margin-bottom: 10px;
+position: relative;
+padding-left: 10px;
+line-height: 1.6;
+display: block;
+}
+
+.detail-text li:before {
+content: "•";
+color: #3f51b5;
+font-weight: bold;
+position: absolute;
+left: -15px;
+font-size: 1.2em;
+top: 0.1em;
+}
+
+.principle-points-two-rows {
+display: flex;
+flex-direction: column;
+gap: 30px;
+margin: 30px 0;
+}
+
+.principle-point-row {
+display: flex;
+flex-wrap: wrap;
+gap: 25px;
+}
+
+.principle-point-row:first-child .principle-point:nth-child(1) {
+flex: 1.2;
+min-width: 280px;
+}
+
+.principle-point-row:first-child .principle-point:nth-child(2) {
+flex: 1.8;
+min-width: 380px;
+}
+
+.principle-point-row:nth-child(2) .principle-point:nth-child(1) {
+flex: 1.2;
+min-width: 280px;
+}
+
+.principle-point-row:nth-child(2) .principle-point:nth-child(2) {
+flex: 1.8;
+min-width: 380px;
+}
+
+.principle-point-row:nth-child(3) .principle-point {
+flex: 1 0 100%;
+}
+
+.principle-point {
+background: linear-gradient(135deg, rgba(30, 35, 60, 0.9), rgba(40, 45, 75, 0.8));
+padding: 22px;
+border-radius: 12px;
+border-left: 4px solid #4caf50;
+box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+transition: transform 0.3s ease;
+display: flex;
+flex-direction: column;
+border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.principle-point:hover {
+transform: translateY(-5px);
+box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+border-color: rgba(76, 175, 80, 0.4);
+}
+.unit-label {
+min-width: 40px;
+text-align: left;
+}
+.principle-point h4 {
+color: #ffffff;
+margin-bottom: 15px;
+font-size: 1.3rem;
+border-bottom: 2px solid rgba(76, 175, 80, 0.7);
+padding-bottom: 10px;
+font-weight: 700;
+text-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+}
+
+.principle-point p {
+color: #d0d5ff;
+line-height: 1.7;
+font-size: 1.05rem;
+flex-grow: 1;
+}
+
+.principle-point:nth-child(2) {
+display: flex;
+flex-direction: column;
+}
+
+.principle-formula {
+background: linear-gradient(135deg, rgba(20, 25, 50, 0.9), rgba(30, 35, 65, 0.8));
+padding: 10px 14px;
+border-radius: 10px;
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+margin-top: 6px;
+margin-bottom: 6px;
+border-left: 3px solid #3f51b5;
+border-right: 3px solid #3f51b5;
+color: #66ccff;
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+animation: formulaGlow 5s infinite alternate;
+font-size: 0.95rem;
+line-height: 1.1;
+white-space: nowrap;
+overflow-x: visible;
+display: block;
+}
+
+.principle-formula p {
+margin-bottom: 3px;
+margin-top: 3px;
+line-height: 1.2;
+font-size: 1.05rem;
+}
+
+.fraction {
+display: inline-block;
+text-align: center;
+vertical-align: middle;
+margin: 0 3px;
+font-size: 0.95em;
+}
+
+.fraction .numerator {
+display: block;
+border-bottom: 1px solid #66ccff;
+padding: 0 4px;
+font-size: 0.95em;
+}
+
+.fraction .denominator {
+display: block;
+padding: 0 4px;
+font-size: 0.95em;
+}
+
+.highlight-main {
+background-color: rgba(100, 200, 255, 0.3);
+color: #ffffff;
+padding: 2px 6px;
+border-radius: 4px;
+font-weight: 700;
+border: 1px solid rgba(100, 200, 255, 0.6);
+display: inline;
+white-space: normal;
+word-break: keep-all;
+}
+
+.highlight-secondary {
+background-color: rgba(255, 200, 100, 0.3);
+color: #fff8e1;
+padding: 2px 6px;
+border-radius: 4px;
+font-weight: 700;
+border: 1px solid rgba(255, 200, 100, 0.6);
+display: inline;
+white-space: normal;
+word-break: keep-all;
+}
+
+.highlight-important {
+background-color: rgba(100, 200, 255, 0.4);
+color: #e0f0ff;
+padding: 2px 6px;
+border-radius: 4px;
+font-weight: 700;
+border: 1px solid rgba(100, 200, 255, 0.7);
+display: inline;
+white-space: normal;
+word-break: keep-all;
+}
+
+.symbol {
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+color: #66ccff;
+font-weight: bold; /* 原为 normal，现改为 bold */
+font-size: 1.15em;
+}
+
+.formula {
+background: linear-gradient(135deg, rgba(20, 25, 50, 0.9), rgba(30, 35, 65, 0.8));
+padding: 20px;
+border-radius: 12px;
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+margin: 20px 0;
+border-left: 4px solid #3f51b5;
+border-right: 4px solid #3f51b5;
+color: #66ccff;
+box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+clear: both;
+animation: formulaGlow 5s infinite alternate;
+}
+
+@keyframes formulaGlow {
+0% { box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); }
+100% { box-shadow: 0 6px 20px rgba(63, 81, 181, 0.5); }
+}
+
+.step {
+background: linear-gradient(135deg, rgba(30, 35, 60, 0.9), rgba(40, 45, 75, 0.8));
+padding: 20px;
+border-radius: 12px;
+margin-bottom: 20px;
+border-left: 4px solid #4caf50;
+box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+clear: both;
+}
+
+/* 新增蓝色方框样式，与 .step 类似但用于注释 */
+.note-box {
+background: linear-gradient(135deg, rgba(30, 35, 60, 0.9), rgba(40, 45, 75, 0.8));
+padding: 20px;
+border-radius: 12px;
+margin: 10px 0 20px; /* 修改：上边距从20px减为10px，左右0，下边距20px */
+border-left: 4px solid #4caf50;
+box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+clear: both;
+color: #d0d5ff;
+}
+
+.application-layout {
+display: flex;
+gap: 30px; /* 恢复为30px */
+margin-top: 25px;
+align-items: center;
+clear: both;
+}
+
+.application-image-container {
+flex: 1; /* 与学习要点平分宽度 */
+border: 1px solid rgba(63, 81, 181, 0.4);
+border-radius: 12px;
+padding: 12px; /* 适当增加内边距 */
+background: linear-gradient(135deg, rgba(20, 25, 50, 0.9), rgba(30, 35, 70, 0.8));
+box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+text-align: center;
+min-width: 280px; /* 恢复为280px */
+max-width: 500px; /* 恢复为500px */
+display: flex;
+align-items: center;
+justify-content: center;
+min-height: 300px; /* 恢复为300px */
+}
+
+.application-image-container img {
+max-width: 100%;
+max-height: 240px; /* 恢复为240px */
+height: auto;
+border-radius: 10px;
+}
+
+.application-step {
+flex: 1; /* 与图片容器相等 */
+margin-bottom: 0;
+min-width: 400px; /* 恢复为400px */
+background: linear-gradient(135deg, rgba(30, 35, 60, 0.9), rgba(40, 45, 75, 0.8));
+padding: 20px 15px; /* 恢复为20px 15px */
+border-radius: 12px;
+border-left: 4px solid #4caf50;
+box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+display: flex;
+align-items: center;
+justify-content: center;
+text-align: left;
+height: auto;
+min-height: 140px;
+max-height: 160px; /* 恢复为160px */
+}
+
+.application-step p {
+margin: 0;
+width: 100%;
+font-size: 1.1rem;
+line-height: 1.6;
+}
+
+.operation-steps-vertical {
+display: flex;
+flex-direction: column;
+gap: 25px;
+margin: 30px 0;
+}
+
+.operation-step-vertical {
+background: linear-gradient(135deg, rgba(30, 35, 60, 0.9), rgba(40, 45, 75, 0.8));
+padding: 22px;
+border-radius: 12px;
+border-left: 4px solid #66ccff;
+box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+display: flex;
+align-items: flex-start;
+transition: transform 0.3s ease;
+border: 1px solid rgba(102, 204, 255, 0.2);
+width: 100%;
+}
+
+.operation-step-vertical:hover {
+transform: translateY(-5px);
+box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+border-color: rgba(102, 204, 255, 0.4);
+}
+
+.operation-step-number {
+display: inline-block;
+background: linear-gradient(135deg, #66ccff, #3399ff);
+color: white;
+width: 36px;
+height: 36px;
+border-radius: 50%;
+text-align: center;
+line-height: 36px;
+margin-right: 18px;
+font-weight: bold;
+box-shadow: 0 0 12px rgba(102, 204, 255, 0.6);
+flex-shrink: 0;
+font-size: 1.1rem;
+}
+
+.operation-content {
+flex: 1;
+}
+
+.operation-button {
+background: linear-gradient(135deg, rgba(63, 81, 181, 0.3), rgba(80, 100, 220, 0.4));
+color: #a5b6ff;
+padding: 8px 14px;
+border-radius: 8px;
+font-weight: 600;
+display: inline-block;
+margin: 0 6px;
+border: 1px solid rgba(63, 81, 181, 0.5);
+transition: all 0.3s;
+font-size: 1rem;
+cursor: pointer;
+white-space: nowrap;
+}
+
+@keyframes buttonGlow {
+0%, 100% { box-shadow: 0 0 5px rgba(63, 81, 181, 0.3); }
+50% { box-shadow: 0 0 10px rgba(63, 81, 181, 0.6); }
+}
+
+.operation-button:hover {
+background: linear-gradient(135deg, rgba(63, 81, 181, 0.5), rgba(80, 100, 220, 0.6));
+color: #ffffff;
+transform: scale(1.05);
+}
+
+.observation-tip {
+color: #b0b5ff;
+font-size: 0.95rem;
+margin: 12px 0 0 0;
+line-height: 2.0;
+background-color: rgba(30, 35, 60, 0.7);
+padding: 12px 15px;
+border-radius: 6px;
+border-left: 3px solid #4caf50;
+width: 100%;
+display: block;
+box-sizing: border-box;
+clear: both;
+}
+
+.observation-tip strong {
+color: #4caf50;
+margin-right: 8px;
+}
+
+.simulation-section {
+background-color: rgba(255, 255, 255, 0.08);
+border-radius: 15px;
+padding: 30px;
+backdrop-filter: blur(10px);
+border: 1px solid rgba(255, 255, 255, 0.15);
+margin-bottom: 40px;
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+position: relative;
+}
+
+.simulation-section h2 {
+text-align: left;
+font-size: 2.2rem;
+color: #ffffff;
+margin-bottom: 25px;
+padding-bottom: 15px;
+border-bottom: 2px solid #3f51b5;
+text-shadow: 0 0 10px rgba(63, 81, 181, 0.5);
+font-weight: 600;
+}
+
+.simulation-layout {
+display: flex;
+flex-wrap: wrap;
+gap: 30px;
+margin-top: 20px;
+}
+
+.control-panel {
+flex: 1;
+min-width: 300px;
+background: linear-gradient(135deg, rgba(20, 25, 50, 0.95), rgba(30, 35, 65, 0.9));
+padding: 25px;
+border-radius: 12px;
+border: 1px solid rgba(63, 81, 181, 0.4);
+box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.control-panel h3 {
+color: #ffffff;
+margin-bottom: 20px;
+font-size: 1.6rem;
+border-bottom: 2px solid rgba(63, 81, 181, 0.8);
+padding-bottom: 10px;
+font-weight: 700;
+text-align: center;
+}
+
+.control-group {
+margin-bottom: 15px;
+padding-bottom: 12px;
+border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+width: 100%;
+box-sizing: border-box;
+}
+
+.control-group label {
+display: block;
+color: #e0e0ff;
+margin-bottom: 8px;
+font-weight: 600;
+font-size: 1.05rem;
+}
+
+.slider-edit-group {
+display: flex;
+align-items: center;
+gap: 12px;
+margin-bottom: 8px;
+width: 100%;
+box-sizing: border-box;
+}
+
+.slider-container {
+flex: 1;
+min-width: 0;
+width: 100%;
+box-sizing: border-box;
+}
+
+.slider-edit-group input[type="range"] {
+width: 100%;
+height: 10px;
+-webkit-appearance: none;
+appearance: none;
+background: linear-gradient(to right, rgba(30, 35, 60, 0.8), rgba(63, 81, 181, 0.8));
+border-radius: 5px;
+outline: none;
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+.slider-edit-group input[type="range"]::-webkit-slider-thumb {
+-webkit-appearance: none;
+appearance: none;
+width: 22px;
+height: 22px;
+border-radius: 50%;
+background: linear-gradient(135deg, #3f51b5, #667eea);
+cursor: pointer;
+box-shadow: 0 0 12px rgba(63, 81, 181, 0.9);
+border: 2px solid #ffffff;
+transition: all 0.2s;
+}
+
+.slider-edit-group input[type="range"]::-webkit-slider-thumb:hover {
+transform: scale(1.1);
+box-shadow: 0 0 15px rgba(63, 81, 181, 1);
+}
+
+.slider-edit-group input[type="range"]::-moz-range-thumb {
+width: 22px;
+height: 22px;
+border-radius: 50%;
+background: linear-gradient(135deg, #3f51b5, #667eea);
+cursor: pointer;
+box-shadow: 0 0 12px rgba(63, 81, 181, 0.9);
+border: 2px solid #ffffff;
+}
+
+.edit-container {
+width: 90px;
+flex-shrink: 0;
+box-sizing: border-box;
+}
+
+/* 单位span固定宽度，保证对齐 */
+.unit-span {
+width: 45px;
+margin-left: 5px;
+color: #e0e0ff;
+display: inline-block;
+}
+
+.slider-edit-group input[type="text"],
+.slider-edit-group select {
+width: 100%;
+padding: 8px 10px;
+border-radius: 6px;
+background: rgba(15, 20, 45, 0.9);
+border: 1px solid rgba(63, 81, 181, 0.6);
+color: #ffffff;
+font-size: 1rem;
+font-weight: 500;
+box-sizing: border-box;
+}
+
+.slider-edit-group input[type="text"]:focus {
+outline: none;
+border-color: #3f51b5;
+box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.3);
+}
+
+/* 修改按钮组为纵向排列 */
+.button-group {
+display: flex;
+flex-direction: column;
+gap: 15px;
+margin-top: 20px;
+}
+
+/* 仿真按钮样式 */
+.sim-button {
+padding: 12px 24px;
+border-radius: 8px;
+border: none;
+font-weight: 700;
+cursor: pointer;
+transition: all 0.3s;
+font-size: 1.05rem;
+text-align: center;
+letter-spacing: 0.5px;
+}
+
+.start-btn {
+background: linear-gradient(135deg, #4a90e2, #5c6bc0);
+color: #ffffff;
+box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+border: 1px solid rgba(74, 144, 226, 0.8);
+}
+
+.start-btn:hover {
+background: linear-gradient(135deg, #5c6bc0, #4a90e2);
+transform: translateY(-3px);
+box-shadow: 0 6px 18px rgba(74, 144, 226, 0.6);
+}
+
+.reset-btn {
+background: linear-gradient(135deg, #f06292, #ec407a);
+color: #ffffff;
+box-shadow: 0 4px 12px rgba(240, 98, 146, 0.4);
+border: 1px solid rgba(240, 98, 146, 0.8);
+}
+
+.reset-btn:hover {
+background: linear-gradient(135deg, #ec407a, #f06292);
+transform: translateY(-3px);
+box-shadow: 0 6px 18px rgba(240, 98, 146, 0.6);
+}
+
+.jump-btn {
+background: linear-gradient(135deg, #ffb74d, #ffa726);
+color: #ffffff;
+box-shadow: 0 4px 12px rgba(255, 183, 77, 0.4);
+border: 1px solid rgba(255, 183, 77, 0.8);
+}
+
+.jump-btn:hover {
+background: linear-gradient(135deg, #ffa726, #ffb74d);
+transform: translateY(-3px);
+box-shadow: 0 6px 18px rgba(255, 183, 77, 0.6);
+}
+
+.light-source-buttons {
+display: flex;
+gap: 12px;
+margin-bottom: 12px;
+width: 100%;
+box-sizing: border-box;
+}
+
+.incidence-buttons {
+display: flex;
+gap: 12px;
+margin-bottom: 12px;
+width: 100%;
+box-sizing: border-box;
+}
+
+/* 替换后的按钮样式 */
+.light-source-button, .incidence-button {
+background: linear-gradient(135deg, rgba(63, 81, 181, 0.4), rgba(80, 100, 220, 0.5));
+color: #a5b6ff;
+border: 1px solid rgba(63, 81, 181, 0.5);
+}
+
+.light-source-button.active, .incidence-button.active {
+background: linear-gradient(135deg, rgba(63, 81, 181, 0.8), rgba(80, 100, 220, 0.9));
+color: #ffffff;
+border-color: rgba(63, 81, 181, 0.8);
+box-shadow: 0 0 15px rgba(63, 81, 181, 0.5);
+}
+
+.light-source-button:hover, .incidence-button:hover {
+background: linear-gradient(135deg, rgba(63, 81, 181, 0.6), rgba(80, 100, 220, 0.7));
+color: #ffffff;
+}
+
+.physical-notes {
+margin-top: 15px;
+padding: 15px;
+background: linear-gradient(135deg, rgba(30, 35, 60, 0.9), rgba(40, 45, 75, 0.8));
+border-radius: 12px;
+border-left: 4px solid #4caf50;
+box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+display: block;
+height: auto;
+min-height: auto;
+max-height: none;
+overflow: visible;
+width: 100%;
+box-sizing: border-box;
+}
+
+.physical-notes h4 {
+color: #ffffff;
+margin-bottom: 12px;
+font-size: 1.3rem;
+font-weight: 600;
+text-align: center;
+border-bottom: 2px solid rgba(76, 175, 80, 0.7);
+padding-bottom: 8px;
+}
+
+.physical-notes ul {
+color: #d0d5ff;
+font-size: 0.95rem;
+line-height: 1.6;
+padding-left: 20px;
+margin: 0;
+display: block;
+width: 100%;
+height: auto;
+list-style-type: disc;
+}
+
+.physical-notes li {
+margin-bottom: 8px;
+padding: 0;
+background: none;
+border-radius: 0;
+flex: none;
+min-width: auto;
+text-align: left;
+white-space: normal;
+word-break: break-word;
+position: relative;
+display: list-item;
+}
+
+.physical-notes li:last-child {
+margin-bottom: 0;
+}
+
+.display-panel {
+flex: 2;
+min-width: 600px;
+background: linear-gradient(135deg, rgba(20, 25, 50, 0.95), rgba(30, 35, 65, 0.9));
+padding: 25px;
+border-radius: 12px;
+border: 1px solid rgba(76, 175, 80, 0.4);
+box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.canvas-container {
+margin-bottom: 20px;
+background: rgba(10, 15, 35, 0.95);
+border-radius: 10px;
+padding: 15px;
+border: 2px solid rgba(63, 81, 181, 0.5);
+box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+position: relative;
+}
+
+.canvas-container h3 {
+color: #ffffff;
+margin-bottom: 15px;
+font-size: 1.4rem;
+text-align: center;
+font-weight: 700;
+border-bottom: 2px solid rgba(76, 175, 80, 0.7);
+padding-bottom: 10px;
+}
+
+.chart-container {
+position: relative;
+width: 100%;
+height: 325px;
+background: rgba(5, 10, 25, 0.9);
+border-radius: 8px;
+overflow: hidden;
+border: 1px solid rgba(255, 255, 255, 0.1);
+box-sizing: border-box;
+}
+
+#intensityCanvas, #patternCanvas {
+width: 100%;
+height: 100%;
+display: block;
+}
+
+.current-params-below {
+margin-top: 15px;
+padding: 12px;
+background: rgba(15, 20, 45, 0.7);
+border-radius: 8px;
+border: 1px solid rgba(255, 255, 255, 0.15);
+text-align: center;
+}
+
+.current-params-below h4 {
+color: #ffffff;
+margin-bottom: 8px;
+font-size: 1.2rem;
+font-weight: 600;
+}
+
+.current-params-below p {
+color: #d0d5ff;
+font-size: 0.9rem;
+line-height: 1.5;
+margin: 5px 0;
+}
+
+.angle-note {
+margin-top: 15px;
+padding: 15px;
+background: rgba(100, 200, 255, 0.15);
+border-radius: 8px;
+border: 1px solid rgba(100, 200, 255, 0.4);
+}
+
+.angle-note p {
+color: #e0f0ff;
+font-size: 0.9rem;
+line-height: 1.5;
+margin: 5px 0;
+text-align: center;
+font-weight: 500;
+}
+
+.footer {
+text-align: center;
+margin-top: 50px;
+color: #a0a5ff;
+font-size: 1rem;
+padding: 25px;
+border-top: 1px solid rgba(255, 255, 255, 0.15);
+opacity: 0.9;
+}
+
+/* 修改：全局数学符号为蓝色并加粗，且字重设为300 */
+.math, mjx-container, mjx-math, .MathJax, .MathJax_CHTML, .MathJax_MathML, .MJXc-display, .MJXc-math, mjx-math {
+color: #66ccff !important;
+font-weight: 300 !important; /* 修改为300 */
+white-space: normal !important;
+display: inline !important;
+}
+
+mjx-math svg {
+fill: #66ccff !important;
+}
+
+.principle-formula, .formula, .formula-inline, .symbol {
+color: #66ccff;
+font-weight: 300; /* 修改为300 */
+white-space: normal;
+}
+
+mjx-container {
+display: inline !important;
+white-space: normal !important;
+overflow-x: visible !important;
+}
+</style>
+
+<!-- 新仿真代码的样式（合并到原有样式之后，以覆盖类名） -->
+<style>
+/* 新仿真样式 */
+.app-container {
+max-width: 1200px;
+margin: 0 auto;
+padding: 20px;
+}
+.simulation-section {
+background-color: rgba(255, 255, 255, 0.08);
+border-radius: 15px;
+padding: 30px;
+backdrop-filter: blur(10px);
+border: 1px solid rgba(255, 255, 255, 0.15);
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+.section-title {
+font-size: 2.2rem;
+color: #ffffff;
+margin-bottom: 25px;
+padding-bottom: 15px;
+border-bottom: 2px solid #3f51b5;;
+text-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
+text-align: left;
+}
+.simulation-layout {
+display: flex;
+flex-wrap: wrap;
+gap: 30px;
+margin-top: 20px;
+}
+.control-panel {
+flex: 1;
+min-width: 300px;
+background: linear-gradient(135deg, rgba(20, 25, 50, 0.95), rgba(30, 35, 65, 0.9));
+padding: 25px;
+border-radius: 12px;
+border: 1px solid rgba(33, 150, 243, 0.4);
+box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+.control-panel h3 {
+color: #ffffff;
+margin-bottom: 20px;
+font-size: 1.6rem;
+border-bottom: 2px solidrgba(63, 81, 181, 0.8);
+padding-bottom: 10px;
+text-align: center;
+}
+.control-group {
+margin-bottom: 20px;
+padding-bottom: 15px;
+border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.control-group label {
+display: block;
+color: #e0e0ff;
+margin-bottom: 8px;
+font-weight: 600;
+}
+.slider-edit-group {
+display: flex;
+align-items: center;
+gap: 12px;
+}
+.slider-container {
+flex: 1;
+}
+.slider-edit-group input[type="range"] {
+width: 100%;
+height: 10px;
+background: linear-gradient(to right, rgba(30, 35, 60, 0.8), rgba(63, 81, 181, 0.8));
+border-radius: 5px;
+outline: none;
+}
+.slider-edit-group input[type="range"]::-webkit-slider-thumb {
+-webkit-appearance: none;
+width: 22px;
+height: 22px;
+border-radius: 50%;
+background: linear-gradient(135deg, #3F51B5CC,);
+cursor: pointer;
+box-shadow: 0 0 12px rgba(63, 81, 181, 0.8);
+border: 2px solid #ffffff;
+transition: all 0.2s;
+}
+.slider-edit-group input[type="range"]::-webkit-slider-thumb:hover {
+transform: scale(1.1);
+box-shadow: 0 0 15px rgba(63, 81, 181, 0.8);
+}
+.edit-container {
+width: 90px;
+}
+.slider-edit-group input[type="number"] {
+width: 100%;
+padding: 8px 10px;
+border-radius: 6px;
+background: rgba(15, 20, 45, 0.9);
+border: 1px solid rgba(33, 150, 243, 0.6);
+color: #ffffff;
+font-size: 1rem;
+font-weight: 500;
+}
+.slider-edit-group input[type="number"]:focus {
+outline: none;
+border-color: #2196f3;
+box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3);
+}
+.count-display {
+margin-top: 15px;
+padding: 15px;
+background: rgba(15, 20, 45, 0.7);
+border-radius: 8px;
+border-left: 4px solid #2196f3;
+text-align: center;
+font-size: 1.1rem;
+font-weight: 600;
+color: #ffffff;
+}
+.display-panel {
+flex: 2;
+min-width: 600px;
+background: linear-gradient(135deg, rgba(20, 25, 50, 0.95), rgba(30, 35, 65, 0.9));
+padding: 25px;
+border-radius: 12px;
+border: 1px solid rgba(76, 175, 80, 0.4);
+box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+.canvas-container {
+background: rgba(10, 15, 35, 0.95);
+border-radius: 10px;
+padding: 15px;
+border: 2px solid rgba(33, 150, 243, 0.5);
+box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+.canvas-container h3 {
+color: #ffffff;
+margin-bottom: 15px;
+font-size: 1.4rem;
+text-align: center;
+border-bottom: 2px solid rgba(76, 175, 80, 0.7);
+padding-bottom: 10px;
+}
+.chart-container {
+position: relative;
+width: 100%;
+height: 400px;
+background: #0a0f1f;
+border-radius: 8px;
+overflow: hidden;
+border: 1px solid rgba(255, 255, 255, 0.1);
+}
+canvas {
+width: 100%;
+height: 100%;
+display: block;
+}
+.current-params-below {
+margin-top: 15px;
+padding: 12px;
+background: rgba(15, 20, 45, 0.7);
+border-radius: 8px;
+text-align: center;
+}
+.current-params-below h4 {
+color: #ffffff;
+margin-bottom: 8px;
+font-size: 1.2rem;
+}
+.current-params-below p {
+color: #d0d5ff;
+font-size: 0.95rem;
+margin: 5px 0;
+}
+@media (max-width: 992px) {
+.simulation-layout {
+flex-direction: column;
+}
+.control-panel, .display-panel {
+min-width: 100%;
+}
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- 星光粒子容器 -->
+<div id="starParticles"></div>
+
+<!-- 固定导航栏 -->
+<div class="nav-container">
+<ul class="nav-list">
+<li class="nav-item active" onclick="scrollToSection('definition')">
+<div class="nav-dot"></div>
+<span>实验背景</span>
+</li>
+<li class="nav-item" onclick="scrollToSection('principle')">
+<div class="nav-dot"></div>
+<span>实验原理</span>
+</li>
+<li class="nav-item" onclick="scrollToSection('operation')">
+<div class="nav-dot"></div>
+<span>操作方法</span>
+</li>
+<li class="nav-item" onclick="scrollToSection('simulation')">
+<div class="nav-dot"></div>
+<span>实验仿真</span>
+</li>
+<!-- 新增返回首页按钮，链接到同级 index.html -->
+<li class="nav-item" onclick="window.location.href='../index.html'">
+<div class="nav-dot"></div>
+<span>返回首页</span>
+</li>
+</ul>
+</div>
+
+<div class="main-container">
+<!-- 主标题 -->
+<h1 class="main-title">单电子单缝衍射实验</h1>
+
+<!-- 实验描述部分（三列，无图片） -->
+<div id="definition" class="content-section">
+<h2 class="section-title">实验背景</h2>
+<div class="definition-four-columns">
+<div class="definition-column">
+<div class="definition-title">实验简介</div>
+<div class="definition-content">
+<p><span class="highlight-main">单电子单缝衍射实验</span>是验证微观粒子<span class="highlight-secondary">波粒二象性</span>的关键实验。当电子流强度较大时，大量电子短时间内通过单缝，接收屏上直接呈现连续的衍射图样；当电子流强度调至很弱时，电子逐个通过单缝，屏上初始呈现随机分布的亮点（体现粒子性），但随着电子数量累积，逐渐形成与强电子流相同的衍射图样（体现波动性）。这一结果表明，波动性是每个电子的固有属性，而非电子间相互作用的结果。</p>
+</div>
+</div>
+<div class="definition-column">
+<div class="definition-title">实验描述</div>
+<div class="definition-content">
+<p>单电子单缝衍射实验是指将电子束强度调控到使电子逐个通过单缝，在接收屏上逐步积累形成衍射图样的物理实验。该实验直接展示了微观粒子的波粒二象性：单个电子在屏上呈现随机点（粒子性），大量电子的统计分布形成确定的衍射图样（波动性）。</p>
+</div>
+</div>
+<div class="definition-column">
+<div class="definition-title">教学提示</div>
+<div class="definition-content">
+<p>本实验的核心是<span class="highlight-secondary">波函数的统计解释</span>：波函数在空间中某一点的强度（振幅绝对值的平方）决定在该点找到粒子的概率密度，衍射图样即为概率分布的宏观体现。实验表明，电子的波动性既表现为大量电子在同一实验中的统计结果，也表现为单个电子在许多次相同实验中的统计结果。单个电子落点随机，但大量电子的统计分布形成确定的衍射图样——这是理解<span class="highlight-main">单电子衍射现象</span>的关键。</p>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 实验原理部分（删除顶部图片，保留应用图片） -->
+<div id="principle" class="content-section">
+<h2 class="section-title">实验原理</h2>
+<div class="principle-layout">
+<div class="detail-text">
+<h3>实验原理</h3>
+<div class="principle-points-two-rows">
+<div class="principle-point-row">
+<div class="principle-point">
+<h4>1. 微观粒子的<span class="highlight-main">波粒二象性</span></h4>
+<p>1924年，德布罗意提出微观粒子具有波粒二象性的假说，将粒子的性质与波的性质通过以下关系联系起来（正像光子和光波的关系一样）：</p>
+<div class="principle-formula" style="text-align: center; margin-top: 0; margin-bottom: 0;">
+<p>\(E = h\nu = \hbar\;\omega \quad\quad \pmb{p} = \dfrac{h}{\lambda}\pmb{e}_{\pmb{\text{k}}} = \hbar\;\pmb{k}\)</p>
+</div>
+<p>其中 <span class="symbol">\(h\)</span> 为普朗克常量，<span class="symbol">\(\hbar = \frac{h}{2\pi}\)</span>为约化普朗克常量，<span class="symbol">\(\omega\)</span>为波的角频率，<span class="symbol">\(\pmb{k}\)</span>为波矢（大小<span class="symbol">\(k = \frac{2\pi}{\lambda}\)</span>），\(\pmb{e}_{\pmb{\text{k}}}\)为波矢方向的单位矢量。该公式称为<span class="highlight-important">德布罗意公式</span>，或德布罗意关系。</p>
+</div>
+<div class="principle-point">
+<h4>2. <span class="highlight-main">波函数的统计解释</span></h4>
+<ul style="margin-left: 0; padding-left: 20px; list-style: none; color: #3f51b5;">
+<li style="display: list-item; margin-bottom: 12px;"><span style="color: #d0d5ff;">波函数的概率解释由玻恩首先提出。他指出，波函数在空间中某一点的强度（振幅绝对值的平方）与该点找到粒子的概率密度成正比。按照这种解释，<span class="highlight-secondary">描述微观粒子的波乃是概率波</span>。</span></li>
+<li style="display: list-item; margin-bottom: 0;"><span style="color: #d0d5ff;">在衍射图样中，衍射极大处波的强度大，粒子出现在该处的概率也大，因而投射到该处的粒子多；衍射极小处波的强度很小（甚至为零），粒子出现在该处的概率也很小（或为零），因而投射到该处的粒子很少（或没有）。因此，由波函数可得出粒子在空间任意一点出现的概率，波函数完全描述了微观粒子的量子态。</span></li>
+</ul>
+</div>
+</div>
+<div class="principle-point-row">
+<div class="principle-point">
+<h4>3. <span class="highlight-main">单电子衍射的积累现象</span></h4>
+<p>实验表明，衍射图样的分布与入射电子流强度无关。当电子流强度减小到使电子逐个通过单缝（同一时刻仅有一个电子）时，接收屏上最初出现随机分布的点，体现出粒子性。但随着时间增加，点的数目逐渐增多，其分布逐渐形成与强电子流时完全相同的衍射图样。这说明单个电子的行为与其他电子无关，衍射图样并非由电子间的相互作用产生。实验所体现的电子的波动性，是大量电子在同一实验中的统计结果，也是单个电子在许多次相同实验中的统计结果。单个电子的落点看似随机，但其概率分布是确定的。</p>
+</div>
+<div class="principle-point">
+<h4>4. 概率波的数学描述</h4>
+<ul style="margin-left: 0; padding-left: 20px; list-style: none; color: #3f51b5;">
+<li style="display: list-item; margin-bottom: 12px;">
+<span style="color: #d0d5ff;">设波函数 \(Φ(\pmb{r},t)\) 描写粒子的状态。以 \(\mathrm{d}W(\pmb{r},t)\) 表示在时刻 \(t\) ，体积元 \(\mathrm{d}V = \mathrm{d}x\mathrm{d}y\mathrm{d}z\)内找到粒子的概率。按照波函数的统计解释，有</span>
+<div class="principle-formula" style="text-align: center; margin: 15px 0; padding: 8px 25px; line-height: 1.2;">\[\mathrm{d}W(\pmb{r},t) = C|Φ(\pmb{r},t)|^{2}\mathrm{d}V\]</div>
+<span style="color: #d0d5ff;">式中\(C\)为归一化常数。概率密度定义为</span>
+<div class="principle-formula" style="text-align: center; margin: 15px 0; padding: 8px 25px; line-height: 1.2;">\[w\left( \pmb{r},t \right) = \frac{\mathrm{d}W\left( \pmb{r},t \right)}{\mathrm{d}V} = C|Φ(\pmb{r},t)|^{2}\]</div>
+<span style="color: #d0d5ff;">它表示在时刻\({t}\)、\(\pmb{r}\)点附近单位体积内找到粒子的概率。</span>
+</li>
+<li style="display: list-item; margin-bottom: 0;">
+<span style="color: #d0d5ff;">由于粒子必定要在空间某点出现，粒子在空间各点出现的概率总和等于1，因此波函数满足归一化条件：</span>
+<div class="principle-formula" style="text-align: center; margin: 15px 0; padding: 8px; line-height: 1.2;">\[C\int_{- \infty}^{+ \infty}{\left| Φ(\pmb{r},t) \right|^{2}\mathrm{d}V} = 1\]</div>
+<span style="color: #d0d5ff;">或等价地，归一化波函数满足\(\int_{- \infty}^{+ \infty}{|Ψ|^{2}\mathrm{d}V} = 1\)。</span>
+</li>
+</ul>
+</div>
+</div>
+<div class="principle-point-row">
+<div class="principle-point">
+<h4>5. <span class="highlight-main">实验现象</span></h4>
+<ul>
+<li>改变入射电子总数：在电子流强度（单位时间电子数）固定时，入射电子总数较少时，接收屏上仅出现少量随机分布的点，无法形成完整图样；随着入射电子总数增加，点的数目逐渐增多，逐步呈现衍射条纹的轮廓；当入射电子总数足够多时，形成清晰稳定的衍射图样。</li>
+<li>改变电子流强度：在入射电子总数固定时，当电子流强度较大时，单位时间内通过单缝的电子多，接收屏上很快出现完整的衍射图样；当电子流强度较小时，电子逐个通过，接收屏上先出现一个个随机分布的点，需要更长的实验时间才能积累形成与强电子流时完全相同的衍射图样。</li>
+</ul>
+<div class="note-box">
+<p><strong>注：</strong>衍射图样的稳定性和清晰度仅取决于入射电子总数是否达到足够的统计数量，与电子流强度无关。电子流强度只影响图样形成的快慢，不改变衍射条纹的位置和相对强度。</p>
+</div>
+</div>
+</div>
+</div>
+<h3>原理应用</h3>
+<p>基于电子衍射图样与缝宽、德布罗意波长的关系，该实验的原理可应用于纳米尺度的精密尺寸测量、量子力学基本原理论证、电子光学系统分析等领域。</p>
+<div class="application-layout">
+<div class="application-image-container">
+<img src="../images/es/1.png" alt="电子衍射应用">
+</div>
+<div class="step application-step">
+<p><strong>学习要点：</strong> 波函数的统计解释是理解本实验的核心：波函数在空间某点的强度（模平方）决定在该点找到电子的概率密度。单个电子落点随机，但大量电子的统计分布形成确定的衍射图样，这是理解单电子衍射现象及其应用的理论基础。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 操作方法部分 -->
+<div id="operation" class="content-section">
+<h2 class="section-title">操作方法</h2>
+<div class="detail-text">
+<h3>操作方法</h3>
+<div class="operation-steps-vertical">
+<div class="operation-step-vertical">
+<div class="operation-step-number">1</div>
+<div class="operation-content">
+<p>调节<span class="highlight-secondary">入射电子总数</span>：滑动<span class="operation-button">"入射电子总数"</span>滑块或在数值输入框中输入电子数量。</p>
+<div class="observation-tip">
+<strong>观察要点：</strong>保持电子流强度（单位时间电子数）不变，当入射电子总数较少时，接收屏上出现一个个随机分布的点，体现电子的粒子性；随着电子总数逐渐增加，点的分布逐渐呈现衍射条纹的轮廓；当电子总数足够多时，形成清晰的衍射图样，体现电子的波动性。这一过程表明，衍射图样是大量电子在同一实验中的统计结果。
+</div>
+</div>
+</div>
+<div class="operation-step-vertical">
+<div class="operation-step-number">2</div>
+<div class="operation-content">
+<p>调节<span class="highlight-secondary">电子流强度</span>：滑动<span class="operation-button">"入射电子流强度"</span>滑块或在数值输入框输入单位时间电子发射数。</p>
+<div class="observation-tip">
+<strong>观察要点：</strong>保持入射电子总数不变，当电子流强度较大时，单位时间内打到接收屏上的电子多，衍射图样迅速形成；当电子流强度较小时，电子逐个通过单缝并到达接收屏，需要更长时间积累才能形成衍射图样，但最终形成的图样与电子流强度较大时完全相同。这一结果表明，衍射图样的分布与电子流强度无关，仅取决于入射电子总数是否达到足够的统计数量。
+</div>
+</div>
+</div>
+</div>
+<div class="step">
+<p><strong>操作提示：</strong> 建议按步骤依次操作，采用控制变量法：步骤①固定电子流强度、改变入射电子总数；步骤②固定入射电子总数、改变电子流强度。通过对比观察，理解"入射电子总数决定图样完整性，电子流强度只影响图样形成速度"的规律。</p>
+</div>
+</div>
+</div>
+
+<!-- 实验仿真操作界面（保留id="simulation"） -->
+<div id="simulation" class="simulation-section" style="margin-bottom:40px;">
+<h2 class="section-title">实验仿真</h2>
+<div class="simulation-layout">
+<!-- 控制面板 -->
+<div class="control-panel">
+<h3>参数控制面板</h3>
+
+<!-- 1. 入射电子总数：范围移到标签内，输入框后加单位“个” -->
+<div class="control-group">
+<label for="totalElectronSlider">1. 入射电子总数(1000~150000个)：</label>
+<div class="slider-edit-group">
+<div class="slider-container">
+<input type="range" id="totalElectronSlider" min="1000" max="150000" value="50000" step="500">
+</div>
+<div class="edit-container">
+<input type="number" id="totalElectronEdit" value="50000" min="1000" max="150000" step="500">
+</div>
+<span class="unit-span">个</span>
+</div>
+</div>
+
+<!-- 2. 入射电子流强度：范围移到标签内，输入框后加单位“个/秒” -->
+<div class="control-group">
+<label for="emissionRateSlider">2. 入射电子流强度(10~20000个/秒)：</label>
+<div class="slider-edit-group">
+<div class="slider-container">
+<input type="range" id="emissionRateSlider" min="10" max="20000" value="5000" step="10">
+</div>
+<div class="edit-container">
+<input type="number" id="emissionRateEdit" value="5000" min="10" max="20000" step="10">
+</div>
+<span class="unit-span">个/秒</span>
+</div>
+</div>
+
+<!-- 操作按钮 - 修改为两行布局：第一行左右两个按钮，第二行一个按钮 -->
+<div class="button-group">
+<div style="display: flex; gap: 15px; width: 100%;">
+<button id="startBtn" class="sim-button start-btn" style="flex:1;">开始模拟</button>
+<button id="resetBtn" class="sim-button reset-btn" style="flex:1;">重置屏</button>
+</div>
+<div style="display: flex; width: 100%;">
+<button id="jumpBtn" class="sim-button jump-btn" style="flex:1;">一键跳跃到结果</button>
+</div>
+</div>
+
+<!-- 计数显示 -->
+<div id="countDisplay" class="count-display">
+已发射电子数: 0 / 50000
+</div>
+</div>
+
+<!-- 显示面板：电子接收屏，带底部X轴和垂直居中Y轴 -->
+<div class="display-panel">
+<div class="canvas-container">
+<h3>电子接收屏</h3>
+<div class="chart-container">
+<canvas id="screenCanvas"></canvas>
+</div>
+</div>
+<div class="current-params-below">
+<h4>当前实验参数</h4>
+<p id="currentParamsText">入射电子总数: 50000 个 | 入射电子流强度: 5000 个/秒</p>
+</div>
+</div>
+</div>
+</div>
+
+<div class="footer">
+</div>
+</div>
+
+<!-- 星光粒子相关脚本和原有导航脚本等（保持不变） -->
+<script>
+// ====================== 星光粒子、导航等原有脚本 ======================
+let isUpdating = false;
+let lastUpdateTime = 0;
+
+// 导航滚动
+function scrollToSection(sectionId) {
+const element = document.getElementById(sectionId);
+if (element) {
+element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+updateNavActiveState(sectionId);
+}
+}
+
+function updateNavActiveState(sectionId) {
+const navItems = document.querySelectorAll('.nav-item');
+navItems.forEach(item => item.classList.remove('active'));
+const navMap = { 'definition': 0, 'principle': 1, 'operation': 2, 'simulation': 3 };
+if (navMap[sectionId] !== undefined) {
+navItems[navMap[sectionId]].classList.add('active');
+}
+}
+
+// 星星粒子
+function createStarParticles() {
+const container = document.getElementById('starParticles');
+if (!container) return;
+const particleCount = 50;
+for (let i = 0; i < particleCount; i++) {
+const star = document.createElement('div');
+star.className = 'star-particle';
+star.style.left = Math.random() * 100 + 'vw';
+star.style.top = Math.random() * 100 + 'vh';
+star.style.width = (Math.random() * 3 + 1) + 'px';
+star.style.height = star.style.width;
+star.style.animation = `particleFloat ${Math.random()*10+10}s ${Math.random()*5}s infinite linear`;
+container.appendChild(star);
+}
+}
+
+const style = document.createElement('style');
+style.textContent = `
+@keyframes particleFloat {
+0% { transform: translateY(0) translateX(0); opacity: 0; }
+10% { opacity: 0.7; }
+90% { opacity: 0.7; }
+100% { transform: translateY(-100vh) translateX(${Math.random()*100-50}px); opacity: 0; }
+}
+`;
+document.head.appendChild(style);
+
+function handleScroll() {
+const sections = ['definition', 'principle', 'operation', 'simulation'];
+const scrollPosition = window.scrollY + 100;
+for (let i = sections.length - 1; i >= 0; i--) {
+const section = document.getElementById(sections[i]);
+if (section && section.offsetTop <= scrollPosition) {
+updateNavActiveState(sections[i]);
+break;
+}
+}
+}
+
+// 旧仿真部分已替换，原有的runSimulation等不再使用，但保留事件绑定部分以免影响导航等
+document.addEventListener('DOMContentLoaded', function() {
+createStarParticles();
+window.addEventListener('scroll', handleScroll);
+
+const opButtons = document.querySelectorAll('.operation-button');
+opButtons.forEach(button => {
+button.addEventListener('click', function(e) {
+e.stopPropagation();
+this.style.backgroundColor = '#3f51b5';
+this.style.color = 'white';
+setTimeout(() => {
+this.style.backgroundColor = '';
+this.style.color = '';
+}, 300);
+});
+});
+
+// 新仿真代码的初始化已在下面进行，这里不再重复
+console.log('单电子单缝衍射仿真系统已启动！');
+});
+</script>
+
+<!-- 新仿真代码的JavaScript（直接内嵌） -->
+<script>
+// ====================== 新仿真代码 ======================
+(function() {
+// 物理参数
+const lambda = 20e-9; // 电子德布罗意波长 20 nm
+const a = 1.1e-6; // 单缝宽度 1.1 μm
+const f = 0.5; // 缝屏距离 0.5 m
+const Xmax = 0.05; // 屏水平范围 ±50 mm
+const Ymax = 0.025; // 屏竖直范围 ±25 mm
+
+// 亮度映射参数
+const MIN_BRIGHT = 180; // 最小亮度
+const MAX_BRIGHT = 255; // 最大亮度
+const HALF_SATURATION = 50; // 半饱和常数
+
+// 颜色基调：冰蓝色 #00E5FF
+const BASE_R = 0;
+const BASE_G = 229;
+const BASE_B = 255;
+
+// 全局状态
+let totalElectrons = 50000;
+let emissionRate = 5000;
+let currentCount = 0;
+let electrons = [];
+let animationInterval = null;
+let isRunning = false;
+
+// 像素累积数组
+let pixelCounts = null;
+let canvasWidth = 0, canvasHeight = 0;
+
+// DOM 元素
+const screenCanvas = document.getElementById('screenCanvas');
+const screenCtx = screenCanvas.getContext('2d');
+
+const totalElectronSlider = document.getElementById('totalElectronSlider');
+const totalElectronEdit = document.getElementById('totalElectronEdit');
+const emissionRateSlider = document.getElementById('emissionRateSlider');
+const emissionRateEdit = document.getElementById('emissionRateEdit');
+
+const startBtn = document.getElementById('startBtn');
+const resetBtn = document.getElementById('resetBtn');
+const jumpBtn = document.getElementById('jumpBtn');
+const countDisplay = document.getElementById('countDisplay');
+const currentParamsText = document.getElementById('currentParamsText');
+
+// 核心物理函数
+function diffractionProbability(x) {
+const alpha = Math.PI * a * Math.abs(x) / (lambda * f);
+if (Math.abs(alpha) < 1e-12) return 1.0;
+const s = Math.sin(alpha);
+if (Math.abs(s) < 1e-10) return 0.0;
+let p = Math.pow(s / alpha, 2);
+if (p < 1e-15) return 0.0;
+return p;
+}
+
+function generateElectronX() {
+while (true) {
+const x = (Math.random() * 2 - 1) * Xmax;
+const p = diffractionProbability(x);
+if (p === 0) continue;
+if (Math.random() <= p) return x;
+}
+}
+
+// 像素操作
+function initPixelArray() {
+canvasWidth = screenCanvas.width;
+canvasHeight = screenCanvas.height;
+pixelCounts = new Array(canvasWidth);
+for (let i = 0; i < canvasWidth; i++) {
+pixelCounts[i] = new Array(canvasHeight).fill(0);
+}
+}
+
+function addElectronToPixel(x, y) {
+const canvasX = Math.round((x + Xmax) / (2 * Xmax) * canvasWidth);
+const canvasY = Math.round((y + Ymax) / (2 * Ymax) * canvasHeight);
+if (canvasX < 0 || canvasX >= canvasWidth || canvasY < 0 || canvasY >= canvasHeight) return;
+pixelCounts[canvasX][canvasY] += 1;
+}
+
+// 绘制坐标轴：X轴在底部，Y轴垂直居中
+function drawAxes() {
+screenCtx.save();
+screenCtx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+screenCtx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+screenCtx.lineWidth = 1.5;
+screenCtx.font = 'bold 14px Arial';
+screenCtx.textAlign = 'center';
+screenCtx.textBaseline = 'middle';
+
+const margin = 15;
+const arrowSize = 8;
+
+// X轴：底部水平线
+const xStart = margin;
+const xEnd = canvasWidth - margin;
+const yXAxis = canvasHeight - margin;
+
+screenCtx.beginPath();
+screenCtx.moveTo(xStart, yXAxis);
+screenCtx.lineTo(xEnd, yXAxis);
+screenCtx.stroke();
+
+// X轴箭头 (向右)
+screenCtx.beginPath();
+screenCtx.moveTo(xEnd - arrowSize, yXAxis - arrowSize/2);
+screenCtx.lineTo(xEnd, yXAxis);
+screenCtx.lineTo(xEnd - arrowSize, yXAxis + arrowSize/2);
+screenCtx.closePath();
+screenCtx.fill();
+
+// X轴标签 "x"
+screenCtx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+screenCtx.fillText('x', xEnd + margin/2, yXAxis - 3);
+
+// Y轴：垂直中线
+const xYAxis = canvasWidth / 2;
+const yStart = margin;
+const yEnd = canvasHeight - margin;
+
+screenCtx.beginPath();
+screenCtx.moveTo(xYAxis, yStart);
+screenCtx.lineTo(xYAxis, yEnd);
+screenCtx.stroke();
+
+// Y轴箭头 (向上)
+screenCtx.beginPath();
+screenCtx.moveTo(xYAxis - arrowSize/2, yStart + arrowSize);
+screenCtx.lineTo(xYAxis, yStart);
+screenCtx.lineTo(xYAxis + arrowSize/2, yStart + arrowSize);
+screenCtx.closePath();
+screenCtx.fill();
+
+// Y轴标签 "y"
+screenCtx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+screenCtx.fillText('y', xYAxis + 12, yStart - 6);
+
+screenCtx.restore();
+}
+
+function renderScreen() {
+// 清空画布为背景色
+screenCtx.fillStyle = '#0a0f1f';
+screenCtx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+if (!pixelCounts) return;
+
+const imageData = screenCtx.createImageData(canvasWidth, canvasHeight);
+const data = imageData.data;
+
+for (let y = 0; y < canvasHeight; y++) {
+for (let x = 0; x < canvasWidth; x++) {
+const count = pixelCounts[x][y];
+if (count === 0) continue;
+
+const brightnessFactor = count / (count + HALF_SATURATION);
+let brightness = MIN_BRIGHT + (MAX_BRIGHT - MIN_BRIGHT) * brightnessFactor;
+if (brightness > MAX_BRIGHT) brightness = MAX_BRIGHT;
+
+const idx = (y * canvasWidth + x) * 4;
+data[idx] = Math.round(brightness * BASE_R / 255);
+data[idx + 1] = Math.round(brightness * BASE_G / 255);
+data[idx + 2] = Math.round(brightness * BASE_B / 255);
+data[idx + 3] = 255;
+}
+}
+screenCtx.putImageData(imageData, 0, 0);
+drawAxes();
+}
+
+function clearScreen() {
+screenCtx.fillStyle = '#0a0f1f';
+screenCtx.fillRect(0, 0, canvasWidth, canvasHeight);
+drawAxes();
+if (pixelCounts) {
+for (let x = 0; x < canvasWidth; x++) {
+for (let y = 0; y < canvasHeight; y++) {
+pixelCounts[x][y] = 0;
+}
+}
+}
+}
+
+// 模拟控制
+function emitElectron() {
+if (currentCount >= totalElectrons) {
+stopAnimation();
+return;
+}
+const x = generateElectronX();
+const y = (Math.random() * 2 - 1) * Ymax;
+electrons.push({x, y});
+addElectronToPixel(x, y);
+currentCount++;
+if (currentCount % 50 === 0) {
+renderScreen();
+}
+updateCountDisplay();
+}
+
+function batchEmitElectrons(count) {
+for (let i = 0; i < count; i++) {
+if (currentCount >= totalElectrons) break;
+const x = generateElectronX();
+const y = (Math.random() * 2 - 1) * Ymax;
+electrons.push({x, y});
+addElectronToPixel(x, y);
+currentCount++;
+}
+renderScreen();
+updateCountDisplay();
+if (currentCount >= totalElectrons) {
+stopAnimation();
+}
+}
+
+function startAnimation() {
+if (isRunning) return;
+if (currentCount >= totalElectrons) {
+resetScreen();
+}
+isRunning = true;
+updateButtonState();
+
+if (emissionRate > 500) {
+const batchSize = Math.max(1, Math.floor(emissionRate / 33));
+animationInterval = setInterval(() => {
+batchEmitElectrons(batchSize);
+}, 30);
+} else {
+const interval = 1000 / emissionRate;
+animationInterval = setInterval(emitElectron, interval);
+}
+}
+
+function stopAnimation() {
+if (!isRunning) return;
+clearInterval(animationInterval);
+isRunning = false;
+renderScreen();
+updateButtonState();
+}
+
+function resetScreen() {
+if (isRunning) stopAnimation();
+currentCount = 0;
+electrons = [];
+if (pixelCounts) {
+clearScreen();
+} else {
+screenCtx.fillStyle = '#0a0f1f';
+screenCtx.fillRect(0, 0, canvasWidth, canvasHeight);
+drawAxes();
+}
+updateCountDisplay();
+updateButtonState();
+}
+
+function jumpToResult() {
+if (isRunning) stopAnimation();
+if (currentCount >= totalElectrons) return;
+
+jumpBtn.disabled = true;
+const batchSize = 5000;
+const generateRemaining = () => {
+const end = Math.min(currentCount + batchSize, totalElectrons);
+for (let i = currentCount; i < end; i++) {
+const x = generateElectronX();
+const y = (Math.random() * 2 - 1) * Ymax;
+electrons.push({x, y});
+addElectronToPixel(x, y);
+}
+currentCount = end;
+renderScreen();
+updateCountDisplay();
+if (currentCount < totalElectrons) {
+setTimeout(generateRemaining, 0);
+} else {
+jumpBtn.disabled = false;
+updateButtonState();
+}
+};
+generateRemaining();
+}
+
+function updateCountDisplay() {
+countDisplay.textContent = `已发射电子数: ${currentCount} / ${totalElectrons}`;
+currentParamsText.textContent = `入射电子总数: ${totalElectrons} 个 | 入射电子流强度: ${emissionRate} 个/秒`;
+}
+
+function updateButtonState() {
+if (isRunning) {
+startBtn.textContent = '暂停模拟';
+} else {
+startBtn.textContent = '开始模拟';
+}
+}
+
+// 双向绑定与事件
+function createBidirectionalBinding(sliderId, editId, min, max, step, callback) {
+const slider = document.getElementById(sliderId);
+const edit = document.getElementById(editId);
+slider.addEventListener('input', function() {
+const value = parseFloat(this.value);
+edit.value = value.toFixed(step >= 1 ? 0 : 1);
+callback(value);
+});
+edit.addEventListener('change', function() {
+let value = parseFloat(this.value);
+if (isNaN(value)) value = parseFloat(slider.value);
+value = Math.max(min, Math.min(max, value));
+slider.value = value;
+this.value = value.toFixed(step >= 1 ? 0 : 1);
+callback(value);
+});
+}
+
+function initEventListeners() {
+createBidirectionalBinding('totalElectronSlider', 'totalElectronEdit', 1000, 150000, 500, (value) => {
+totalElectrons = value;
+resetScreen();
+});
+createBidirectionalBinding('emissionRateSlider', 'emissionRateEdit', 10, 20000, 10, (value) => {
+emissionRate = value;
+if (isRunning) {
+stopAnimation();
+startAnimation();
+}
+});
+
+startBtn.addEventListener('click', () => {
+if (isRunning) {
+stopAnimation();
+} else {
+startAnimation();
+}
+});
+resetBtn.addEventListener('click', resetScreen);
+jumpBtn.addEventListener('click', jumpToResult);
+
+window.addEventListener('resize', () => {
+const oldWidth = canvasWidth;
+const oldHeight = canvasHeight;
+const oldPixels = pixelCounts;
+screenCanvas.width = screenCanvas.parentElement.clientWidth;
+screenCanvas.height = screenCanvas.parentElement.clientHeight;
+initPixelArray();
+if (oldPixels && oldWidth > 0 && oldHeight > 0) {
+for (let x = 0; x < oldWidth; x++) {
+for (let y = 0; y < oldHeight; y++) {
+if (oldPixels[x][y] > 0) {
+const newX = Math.round(x * canvasWidth / oldWidth);
+const newY = Math.round(y * canvasHeight / oldHeight);
+if (newX < canvasWidth && newY < canvasHeight) {
+pixelCounts[newX][newY] += oldPixels[x][y];
+}
+}
+}
+}
+}
+renderScreen();
+});
+}
+
+// 初始化
+document.addEventListener('DOMContentLoaded', function() {
+if (screenCanvas) {
+screenCanvas.width = screenCanvas.parentElement.clientWidth;
+screenCanvas.height = screenCanvas.parentElement.clientHeight;
+initPixelArray();
+initEventListeners();
+resetScreen();
+}
+});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>光的偏振</title>
+    <style>
+        /* ========== 全局样式（与矩孔衍射完全统一） ========== */
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI','Microsoft YaHei',sans-serif;}
+        body{background:radial-gradient(circle at 10% 20%,rgba(20,30,80,0.8) 0%,transparent 30%),radial-gradient(circle at 90% 30%,rgba(40,20,90,0.7) 0%,transparent 40%),radial-gradient(circle at 50% 80%,rgba(30,40,100,0.6) 0%,transparent 35%),linear-gradient(to bottom,#0a0e2a,#1a1f3a,#2d3250);color:#e0e0ff;line-height:1.6;min-height:100vh;background-attachment:fixed;position:relative;overflow-x:hidden;animation:skyMove 30s infinite alternate ease-in-out;padding-top:70px;}
+        @keyframes skyMove{0%{background-position:0% 0%,100% 0%,50% 100%;}100%{background-position:10% 20%,90% 30%,50% 80%;}}
+        body::before,body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-repeat:repeat;z-index:-1;}
+        body::before{background-image:radial-gradient(2px 2px at 20px 30px,#eee,transparent),radial-gradient(2px 2px at 40px 70px,#fff,transparent),radial-gradient(3px 3px at 120px 180px,#ddd,transparent),radial-gradient(2px 2px at 200px 150px,#fff,transparent),radial-gradient(1px 1px at 300px 80px,#eee,transparent),radial-gradient(2px 2px at 350px 200px,#ddd,transparent),radial-gradient(3px 3px at 450px 120px,#fff,transparent),radial-gradient(1px 1px at 500px 250px,#eee,transparent),radial-gradient(2px 2px at 600px 100px,#ddd,transparent);animation:twinkle 8s infinite alternate,starsMove 20s infinite linear;opacity:0.7;}
+        body::after{background-image:radial-gradient(1px 1px at 80px 120px,#bbf,transparent),radial-gradient(2px 2px at 150px 200px,#ccf,transparent),radial-gradient(1px 1px at 250px 80px,#aaf,transparent),radial-gradient(2px 2px at 320px 280px,#ddf,transparent),radial-gradient(1px 1px at 420px 150px,#bbf,transparent),radial-gradient(2px 2px at 500px 320px,#ccf,transparent);animation:twinkle2 5s infinite alternate,starsMove2 25s infinite linear reverse;opacity:0.5;}
+        @keyframes twinkle{0%,100%{opacity:0.5;}50%{opacity:0.9;}}
+        @keyframes twinkle2{0%,100%{opacity:0.3;}50%{opacity:0.7;}}
+        @keyframes starsMove{0%{background-position:0 0;}100%{background-position:200px 100px;}}
+        @keyframes starsMove2{0%{background-position:0 0;}100%{background-position:-150px -80px;}}
+        .star-particle{position:fixed;width:2px;height:2px;background:#fff;border-radius:50%;box-shadow:0 0 5px 1px rgba(255,255,255,0.8);z-index:-1;opacity:0;}
+
+        /* ========== 导航栏样式（新增，不影响任何原有内容） ========== */
+        .nav-container {
+            background-color: rgba(20,25,50,0.95);
+            border-radius: 0 0 12px 12px;
+            padding: 15px 30px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-top: none;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            animation: navFloat 8s ease-in-out infinite;
+        }
+        @keyframes navFloat {
+            0%,100%{transform:translateY(0px);}
+            50%{transform:translateY(-3px);}
+        }
+        .nav-list {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .nav-item {
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(63,81,181,0.3), rgba(30,34,60,0.8));
+            border: 1px solid rgba(100,120,255,0.3);
+        }
+        .nav-item:hover {
+            background: linear-gradient(135deg, rgba(80,100,220,0.5), rgba(50,54,85,0.9));
+            transform: translateY(-3px);
+            border-color: rgba(100,120,255,0.6);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(63,81,181,0.7), rgba(40,45,80,0.9));
+            border-color: rgba(100,120,255,0.8);
+        }
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .nav-item:nth-child(1) .nav-dot { background-color: #bf2ee7; }
+
+        /* ========== 容器样式（完全统一） ========== */
+        .main-container{max-width:1200px;margin:0 auto;padding:20px;position:relative;z-index:1;}
+        .main-title{text-align:center;font-size:2.8rem;color:#fff;margin-bottom:30px;padding-bottom:15px;border-bottom:2px solid #3f51b5;text-shadow:0 0 15px rgba(63,81,181,0.7);letter-spacing:1px;animation:titleGlow 4s ease-in-out infinite;font-weight:700;}
+        @keyframes titleGlow{0%,100%{text-shadow:0 0 15px rgba(63,81,181,0.7);}50%{text-shadow:0 0 25px rgba(63,81,181,0.9),0 0 35px rgba(63,81,181,0.6);}}
+        .simulation-section{background-color:rgba(255,255,255,0.08);border-radius:15px;padding:30px;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);margin-bottom:40px;box-shadow:0 10px 30px rgba(0,0,0,0.4);}
+        .simulation-section h2{text-align:left;font-size:2.2rem;color:#fff;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid #3f51b5;text-shadow:0 0 10px rgba(63,81,181,0.5);font-weight:600;}
+        .simulation-layout{display:flex;flex-wrap:wrap;gap:30px;margin-top:20px;}
+
+        /* ========== 控制面板样式（完全统一） ========== */
+        .control-panel{flex:1.4;min-width:320px;background:linear-gradient(135deg,rgba(20,25,50,0.95),rgba(30,35,65,0.9));padding:30px 25px;border-radius:12px;border:1px solid rgba(63,81,181,0.4);box-shadow:0 6px 20px rgba(0,0,0,0.4);display:flex;flex-direction:column;min-height:620px;}
+        .control-panel h3{color:#fff;margin-bottom:20px;font-size:1.6rem;border-bottom:2px solid rgba(63,81,181,0.8);padding-bottom:10px;font-weight:700;text-align:center;}
+        .control-group{margin-bottom:25px;padding-bottom:15px;border-bottom:1px solid rgba(255,255,255,0.1);width:100%;}
+        .control-group label{display:block;color:#e0e0ff;margin-bottom:8px;font-weight:600;font-size:1.1rem;}
+        .slider-edit-group{display:grid;grid-template-columns:1fr 90px 40px;align-items:center;gap:12px;margin-bottom:5px;width:100%;}
+        .slider-container{min-width:0;}
+        .slider-edit-group input[type="range"]{width:100%;height:10px;-webkit-appearance:none;background:linear-gradient(to right,rgba(30,35,60,0.8),rgba(63,81,181,0.8));border-radius:5px;outline:none;}
+        .slider-edit-group input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#3f51b5,#667eea);cursor:pointer;box-shadow:0 0 12px rgba(63,81,181,0.9);border:2px solid #fff;transition:all .2s;}
+        .slider-edit-group input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.1);}
+        .edit-container{width:90px;flex-shrink:0;}
+        .slider-edit-group input[type="number"]{width:100%;padding:8px 10px;border-radius:6px;background:rgba(15,20,45,0.9);border:1px solid rgba(63,81,181,0.6);color:#fff;font-size:.95rem;font-weight:500;text-align:center;}
+        .slider-edit-group input[type="number"]:focus{outline:none;border-color:#3f51b5;box-shadow:0 0 0 3px rgba(63,81,181,0.3);}
+        .unit-span{width:40px;color:#e0e0ff;font-size:1rem;}
+        .button-group{display:flex;flex-wrap:wrap;gap:12px;margin-top:15px;width:100%;}
+        .sim-button{flex:1;min-width:80px;padding:10px 8px;border-radius:8px;border:none;font-weight:700;cursor:pointer;transition:all 0.3s;font-size:0.9rem;text-align:center;letter-spacing:0.5px;color:#ffffff;line-height: 1.5;}
+        .preset-btn{background:linear-gradient(135deg, #2c3e66, #1e2a47);border:1px solid rgba(100,120,255,0.6);}
+        .preset-btn:hover{background:linear-gradient(135deg, #3f51b5, #2c3e66);transform:translateY(-3px);}
+
+        /* ========== 物理说明样式（完全统一） ========== */
+        .physical-notes{margin-top:25px;padding:15px;background:linear-gradient(135deg, rgba(30, 35, 60, 0.9), rgba(40, 45, 75, 0.8));border-radius:12px;border-left:4px solid #4caf50;box-shadow:0 6px 15px rgba(0,0,0,0.3);}
+        .physical-notes h4{color:#ffffff;margin-bottom:12px;font-size:1.3rem;font-weight:600;text-align:center;border-bottom:2px solid rgba(76, 175, 80, 0.7);padding-bottom:8px;}
+        .physical-notes ul{color:#d0d5ff;font-size:0.95rem;line-height:1.6;padding-left:20px;list-style-type:disc;}
+        .physical-notes li{margin-bottom:8px;}
+        .highlight-important{background-color:rgba(100, 200, 255, 0.4);color:#e0f0ff;padding:2px 6px;border-radius:4px;font-weight:700;border:1px solid rgba(100, 200, 255, 0.7);display:inline;white-space:normal;word-break:keep-all;}
+
+        /* ========== 当前参数样式（与衍射实验完全统一，新增） ========== */
+        .current-params-below {
+            margin-top: 20px;
+            padding: 12px;
+            background: rgba(15, 20, 45, 0.7);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            text-align: center;
+        }
+        .current-params-below h4 {
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .current-params-below p {
+            color: #d0d5ff;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin: 5px 0;
+        }
+
+        /* ========== 显示面板样式（完全统一） ========== */
+        .display-panel{flex:2.3;min-width:450px;background:linear-gradient(135deg,rgba(20,25,50,0.95),rgba(30,35,65,0.9));padding:25px;border-radius:12px;border:1px solid rgba(76,175,80,0.4);box-shadow:0 6px 20px rgba(0,0,0,0.4);display:flex;flex-direction:column;gap:20px;}
+        .canvas-container{background:rgba(10,15,35,0.95);border-radius:10px;padding:15px;border:2px solid rgba(63,81,181,0.5);box-shadow:0 4px 15px rgba(0,0,0,0.3);}
+        .canvas-container h3{color:#fff;margin-bottom:12px;font-size:1.3rem;text-align:center;font-weight:600;border-bottom:2px solid rgba(76,175,80,0.7);padding-bottom:8px;}
+        .chart-container{position:relative;width:100%;background:#000000;border-radius:8px;overflow:hidden;}
+        canvas{width:100%;height:auto;display:block;}
+        .formula-note{color:#7f92d9;font-size:0.9rem;margin-top:8px;text-align:center;background:rgba(63,81,181,0.2);padding:5px 10px;border-radius:20px;}
+        .footer{text-align:center;margin-top:40px;color:#a0a5ff;font-size:1rem;padding:20px;border-top:1px solid rgba(255,255,255,0.15);opacity:0.9;}
+
+        /* ========== 公式样式（与矩孔衍射完全一致） ========== */
+        /* 核心修改：亮蓝色字体添加加粗效果 */
+        .math, mjx-container{color:#66ccff !important; }
+    </style>
+    <!-- 修正：MathJax正确加载位置，无冲突 -->
+    <script id="MathJax-script" async src="../es5/tex-mml-svg.js"></script>
+</head>
+<body>
+    <div id="starParticles"></div>
+
+    <!-- 新增：返回首页导航栏，不影响任何3D图像 -->
+    <div class="nav-container">
+        <ul class="nav-list">
+            <li class="nav-item active" onclick="window.location.href='../index.html'">
+                <div class="nav-dot"></div>
+                <span>返回首页</span>
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-container">
+        <h1 class="main-title">光的偏振</h1>
+
+        <div id="simulation" class="simulation-section">
+            <h2 class="section-title">实验仿真</h2>
+            <div class="simulation-layout">
+                <div class="control-panel">
+                    <h3>参数控制面板</h3>
+                    
+                    <!-- 修正：将斜杠分数改为竖式分数 \dfrac{E_y}{E_x} -->
+                    <div class="control-group">
+                        <label for="sliderR">1. 振幅比 \(r = \dfrac{E_y}{E_x}\)（0~2）：</label>
+                        <div class="slider-edit-group">
+                            <div class="slider-container">
+                                <input type="range" id="sliderR" min="0" max="2.0" step="0.001" value="0.8">
+                            </div>
+                            <div class="edit-container">
+                                <input type="number" id="editR" value="0.8" min="0" max="2.0" step="0.001">
+                            </div>
+                            <span class="unit-span"></span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="sliderDelta">2. 相位差 \(\Delta\phi\) (0~360°)：</label>
+                        <div class="slider-edit-group">
+                            <div class="slider-container">
+                                <input type="range" id="sliderDelta" min="0" max="360" step="0.5" value="45">
+                            </div>
+                            <div class="edit-container">
+                                <input type="number" id="editDelta" value="45" min="0" max="360" step="0.5">
+                            </div>
+                            <span class="unit-span">°</span>
+                        </div>
+                    </div>
+
+                    <!-- 全部按钮都强制分行，彻底解决溢出 -->
+                    <div class="button-group">
+                        <button id="btnLinear" class="sim-button preset-btn">线偏振 <br> \(r=1,\)<br>\(\Delta\phi=0^\circ\)</button>
+                        <button id="btnEllipse" class="sim-button preset-btn">正椭圆 <br>\(r=0.5,\)
+                            <br>\(\Delta\phi=90^\circ\)</button>
+                        <button id="btnSkew" class="sim-button preset-btn">斜椭圆 <br>\(r=0.8,\)<br>\(\Delta\phi=45^\circ\)</button>
+                    </div>
+
+                    <div class="physical-notes">
+                        <h4>物理实验现象说明</h4>
+                        <ul>
+                            <li>
+                                <span class="highlight-important">电场分量</span>：\(E_x = A\cos(\omega t)\)，\(E_y = r A\cos(\omega t+\Delta\phi)\)
+                            </li>
+                            <li>
+                                <span class="highlight-important">线偏振</span>：\(\Delta\phi = 0^\circ\) 或 \(180^\circ\)，光矢量沿固定直线振动
+                            </li>
+                            <li>
+                                <span class="highlight-important">正椭圆偏振</span>：\(\Delta\phi = 90^\circ\) 且 \(r≠1\)，长轴沿坐标轴
+                            </li>
+                            <li>
+                                <span class="highlight-important">斜椭圆偏振</span>：\(\Delta\phi\) 为其他角度，椭圆长轴倾斜
+                            </li>
+                            <li>
+                                <span class="highlight-important">显示范围</span>：\(E_x，\ E_y \in [-10,10]\)
+                            </li>
+                            <li>
+                                <span class="highlight-important">螺旋圈数</span>：5.0 圈；Z轴压缩比 2.3（正方体效果）
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="display-panel">
+                    <div class="canvas-container">
+                        <h3>三维立体环状轨迹</h3>
+                        <div class="chart-container" id="threeContainer" style="height: 480px; background: black;">
+                        </div>
+                        <!-- 补全当前参数HTML结构 -->
+                        <div class="current-params-below">
+                            <h4>当前参数</h4>
+                            <p id="currentParamsText">振幅比: 0.800 | 相位差: 45.0° </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            function createStarParticles() {
+                const container = document.getElementById('starParticles');
+                if (!container) return;
+                const particleCount = 50;
+                for (let i = 0; i < particleCount; i++) {
+                    const star = document.createElement('div');
+                    star.className = 'star-particle';
+                    star.style.left = Math.random() * 100 + 'vw';
+                    star.style.top = Math.random() * 100 + 'vh';
+                    star.style.width = (Math.random() * 3 + 1) + 'px';
+                    star.style.height = star.style.width;
+                    star.style.animation = `particleFloat ${Math.random()*10+10}s ${Math.random()*5}s infinite linear`;
+                    container.appendChild(star);
+                }
+            }
+            // 修正：删除CSS无效的JS变量，纯CSS动画生效
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes particleFloat {
+                    0% { transform: translateY(0) translateX(0); opacity: 0; }
+                    10% { opacity: 0.7; }
+                    90% { opacity: 0.7; }
+                    100% { transform: translateY(-100vh) translateX(0px); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+
+            document.addEventListener('DOMContentLoaded', function() {
+                createStarParticles();
+            });
+        })();
+    </script>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+        const Ex = 6.0;
+        const cycles = 5.0;
+        const t_max_raw = cycles * 2 * Math.PI;
+        const zCompress = 2.3;
+        const t_max_compressed = t_max_raw / zCompress;
+        const axisMin = -10;
+        const axisMax = 10;
+        const N = 2200;
+        
+        let scene, camera, renderer, labelRenderer, controls;
+        let spiralLine, pointCloud;
+        let current_r = 0.8;
+        let current_delta_deg = 45;
+        let targetPos = new THREE.Vector3(0, 0, t_max_compressed / 2);
+        const cameraDistance = 25.4;
+        let currentZoom = 0.71;
+        let currentAngleDeg = 60;
+        let currentElevationDeg = 33;
+        let updatingFromSlider = false;
+        
+        const rSlider = document.getElementById('sliderR');
+        const editR = document.getElementById('editR');
+        const deltaSlider = document.getElementById('sliderDelta');
+        const editDelta = document.getElementById('editDelta');
+        const btnLinear = document.getElementById('btnLinear');
+        const btnEllipse = document.getElementById('btnEllipse');
+        const btnSkew = document.getElementById('btnSkew');
+        // 获取参数显示元素
+        const currentParamsText = document.getElementById('currentParamsText');
+        
+        function addArrow(dir, origin, length, color, headLength = 0.4, headWidth = 0.2) {
+            const arrow = new THREE.ArrowHelper(new THREE.Vector3(dir.x, dir.y, dir.z).normalize(), origin, length, color, headLength, headWidth);
+            scene.add(arrow);
+        }
+        
+        function updateCameraFromControls() {
+            const rad = currentAngleDeg * Math.PI / 180;
+            const elevationRad = currentElevationDeg * Math.PI / 180;
+            const x = cameraDistance * Math.cos(rad) * Math.cos(elevationRad);
+            const y = cameraDistance * Math.sin(rad) * Math.cos(elevationRad);
+            const z = cameraDistance * Math.sin(elevationRad);
+            camera.position.set(x, y, z);
+            controls.target.copy(targetPos);
+            camera.zoom = currentZoom;
+            camera.updateProjectionMatrix();
+            controls.update();
+        }
+        
+        function initThree() {
+            const container = document.getElementById('threeContainer');
+            container.style.height = '480px';
+            
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a1a);
+            scene.fog = new THREE.FogExp2(0x0a0a1a, 0.008);
+            
+            const orthoSize = 10;
+            camera = new THREE.OrthographicCamera(-orthoSize, orthoSize, orthoSize, -orthoSize, 0.1, 100);
+            camera.up.set(0, 0, 1);
+            camera.zoom = currentZoom;
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.height);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+            
+            labelRenderer = new CSS2DRenderer();
+            labelRenderer.setSize(container.clientWidth, container.height);
+            labelRenderer.domElement.style.position = 'absolute';
+            labelRenderer.domElement.style.top = '0px';
+            labelRenderer.domElement.style.left = '0px';
+            labelRenderer.domElement.style.pointerEvents = 'none';
+            container.appendChild(labelRenderer.domElement);
+            
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.rotateSpeed = 1.0;
+            controls.zoomSpeed = 1.2;
+            controls.panSpeed = 0.8;
+            controls.target.copy(targetPos);
+            
+            controls.addEventListener('change', () => {
+                if (updatingFromSlider) return;
+                const pos = camera.position;
+                const dx = pos.x - targetPos.x;
+                const dy = pos.y - targetPos.y;
+                const dz = pos.z - targetPos.z;
+                let angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                let elevation = Math.atan2(dz, Math.sqrt(dx*dx + dy*dy)) * 180 / Math.PI;
+                currentZoom = camera.zoom;
+                currentAngleDeg = angle;
+                currentElevationDeg = elevation;
+            });
+            
+            const ambientLight = new THREE.AmbientLight(0x404060);
+            scene.add(ambientLight);
+            const mainLight = new THREE.DirectionalLight(0xffffff, 1);
+            mainLight.position.set(2, 5, 3);
+            scene.add(mainLight);
+            const fillLight = new THREE.PointLight(0x4466cc, 0.3);
+            fillLight.position.set(-2, 1, 4);
+            scene.add(fillLight);
+            
+            addAxes();
+            updateCameraFromControls();
+            updateThreeGeometry(current_r, current_delta_deg);
+            
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+                labelRenderer.render(scene, camera);
+            }
+            animate();
+            
+            window.addEventListener('resize', () => {
+                const width = container.clientWidth;
+                const height = container.clientHeight;
+                const aspect = width / height;
+                const orthoSize = 10;
+                camera.left = -orthoSize;
+                camera.right = orthoSize;
+                camera.top = orthoSize / aspect;
+                camera.bottom = -orthoSize / aspect;
+                camera.updateProjectionMatrix();
+                renderer.setSize(width, height);
+                labelRenderer.setSize(width, height);
+            });
+            window.dispatchEvent(new Event('resize'));
+        }
+        
+        function addAxes() {
+            const axesMaterial = new THREE.LineBasicMaterial({ color: 0xaaaaaa });
+            const xAxisLine = new THREE.Line(
+                new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(axisMin, 0, 0), new THREE.Vector3(axisMax, 0, 0)]),
+                axesMaterial
+            );
+            const yAxisLine = new THREE.Line(
+                new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, axisMin, 0), new THREE.Vector3(0, axisMax, 0)]),
+                axesMaterial
+            );
+            const zAxisLine = new THREE.Line(
+                new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, t_max_compressed)]),
+                axesMaterial
+            );
+            scene.add(xAxisLine);
+            scene.add(yAxisLine);
+            scene.add(zAxisLine);
+            
+            addArrow(new THREE.Vector3(1,0,0), new THREE.Vector3(axisMax, 0, 0), 0.8, 0xffaa66, 0.3, 0.15);
+            addArrow(new THREE.Vector3(0,1,0), new THREE.Vector3(0, axisMax, 0), 0.8, 0xffaa66, 0.3, 0.15);
+            addArrow(new THREE.Vector3(0,0,1), new THREE.Vector3(0, 0, t_max_compressed), 0.8, 0xffaa66, 0.3, 0.15);
+            
+            const makeLabel = (htmlContent, position, color = '#cccccc') => {
+                const div = document.createElement('div');
+                div.innerHTML = htmlContent;
+                div.style.color = color;
+                div.style.fontSize = '10px';
+                div.style.fontWeight = 'bold';
+                div.style.textShadow = '1px 1px 0px black';
+                div.style.background = 'none';
+                div.style.padding = '0';
+                div.style.border = 'none';
+                div.style.fontFamily = "'Times New Roman', serif";
+                const label = new CSS2DObject(div);
+                label.position.copy(position);
+                scene.add(label);
+            };
+            
+            for (let x = -10; x <= 10; x += 2.5) {
+                if (Math.abs(x) < 0.1) continue;
+                makeLabel(x.toFixed(1), new THREE.Vector3(x, -0.6, -0.2), '#aaa');
+            }
+            for (let y = -10; y <= 10; y += 2.5) {
+                if (Math.abs(y) < 0.1) continue;
+                makeLabel(y.toFixed(1), new THREE.Vector3(-0.7, y, -0.2), '#aaa');
+            }
+            const zRawValues = [0, 5, 10, 15, 20, 25, 30];
+            zRawValues.forEach(zRaw => {
+                if (zRaw <= t_max_raw) {
+                    const zComp = zRaw / zCompress;
+                    makeLabel(zRaw.toFixed(0), new THREE.Vector3(-0.8, -0.8, zComp), '#aaa');
+                }
+            });
+            // 修正：3D标签使用纯文本，避免MathJax渲染冲突
+            makeLabel('Ex', new THREE.Vector3(axisMax + 0.6, 0, -0.3), '#ffaa66');
+            makeLabel('Ey', new THREE.Vector3(0, axisMax + 0.6, -0.3), '#ffaa66');
+            makeLabel('传播方向', new THREE.Vector3(0, -1.0, t_max_compressed + 0.6), '#ffaa66');
+        }
+        
+        function computeSpiral(r, delta_deg) {
+            const Ey = r * Ex;
+            const delta = delta_deg * Math.PI / 180;
+            const t_raw = Array.from({ length: N }, (_, i) => (i / (N - 1)) * t_max_raw);
+            const z_comp = t_raw.map(t => t / zCompress);
+            const x = t_raw.map(t => Ex * Math.cos(t));
+            const y = t_raw.map(t => Ey * Math.cos(t + delta));
+            
+            const points = [];
+            const colors = [];
+            for (let i = 0; i < N; i++) {
+                points.push(new THREE.Vector3(x[i], y[i], z_comp[i]));
+                const phase = t_raw[i] / t_max_raw;
+                const hue = 0.55 - phase * 0.55;
+                const color = new THREE.Color().setHSL(hue, 1.0, 0.6);
+                colors.push(color.r, color.g, color.b);
+            }
+            return { points, colors };
+        }
+        
+        function updateThreeGeometry(r, delta_deg) {
+            const { points, colors } = computeSpiral(r, delta_deg);
+            
+            if (spiralLine) scene.remove(spiralLine);
+            const lineGeometry = new THREE.BufferGeometry();
+            const positions = points.flatMap(v => [v.x, v.y, v.z]);
+            lineGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
+            lineGeometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
+            const lineMaterial = new THREE.LineBasicMaterial({ vertexColors: true, linewidth: 2 });
+            spiralLine = new THREE.Line(lineGeometry, lineMaterial);
+            scene.add(spiralLine);
+            
+            if (pointCloud) scene.remove(pointCloud);
+            const pointsGeometry = new THREE.BufferGeometry();
+            pointsGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
+            pointsGeometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
+            const pointsMaterial = new THREE.PointsMaterial({ size: 0.12, vertexColors: true, transparent: true, opacity: 0.85 });
+            pointCloud = new THREE.Points(pointsGeometry, pointsMaterial);
+            scene.add(pointCloud);
+        }
+        
+        function updateAll() {
+            current_r = parseFloat(rSlider.value);
+            current_delta_deg = parseFloat(deltaSlider.value);
+            editR.value = current_r;
+            editDelta.value = current_delta_deg;
+            // 动态更新当前参数显示
+            currentParamsText.textContent = `振幅比: ${current_r.toFixed(3)} | 相位差: ${current_delta_deg.toFixed(1)}°`;
+            updateThreeGeometry(current_r, current_delta_deg);
+        }
+        
+        function setPreset(r_val, delta_val) {
+            rSlider.value = r_val;
+            deltaSlider.value = delta_val;
+            updateAll();
+        }
+        
+        function bindEvents() {
+            rSlider.addEventListener('input', () => {
+                editR.value = rSlider.value;
+                updateAll();
+            });
+            editR.addEventListener('change', () => {
+                let val = parseFloat(editR.value);
+                val = Math.min(2.0, Math.max(0, val));
+                rSlider.value = val;
+                updateAll();
+            });
+            deltaSlider.addEventListener('input', () => {
+                editDelta.value = deltaSlider.value;
+                updateAll();
+            });
+            editDelta.addEventListener('change', () => {
+                let val = parseFloat(editDelta.value);
+                val = Math.min(360, Math.max(0, val));
+                deltaSlider.value = val;
+                updateAll();
+            });
+            btnLinear.addEventListener('click', () => setPreset(1.0, 0));
+            btnEllipse.addEventListener('click', () => setPreset(0.5, 90));
+            btnSkew.addEventListener('click', () => setPreset(0.8, 45));
+        }
+        
+        function start() {
+            initThree();
+            bindEvents();
+            updateAll();
+        }
+        
+        start();
+    </script>
+</body>
+</html>

@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>合集</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 禁止页面滚动 */
+        html {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* ---------- 动态星空核心样式 ---------- */
+        body {
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(20, 30, 80, 0.8) 0%, transparent 30%),
+                radial-gradient(circle at 90% 30%, rgba(40, 20, 90, 0.7) 0%, transparent 40%),
+                radial-gradient(circle at 50% 80%, rgba(30, 40, 100, 0.6) 0%, transparent 35%),
+                linear-gradient(to bottom, #0a0e2a, #1a1f3a, #2d3250);
+            min-height: 100vh;
+            background-attachment: fixed;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            animation: skyMove 30s infinite alternate ease-in-out;
+            font-family: 'Segoe UI', 'Poppins', 'Roboto', system-ui, -apple-system, 'Microsoft YaHei', sans-serif;
+            color: #f0f3ff;
+            line-height: 1.4;
+        }
+
+        @keyframes skyMove {
+            0% {
+                background-position: 0% 0%, 100% 0%, 50% 100%;
+            }
+            100% {
+                background-position: 10% 20%, 90% 30%, 50% 80%;
+            }
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #eee, transparent),
+                radial-gradient(2px 2px at 40px 70px, #fff, transparent),
+                radial-gradient(3px 3px at 120px 180px, #ddd, transparent),
+                radial-gradient(2px 2px at 200px 150px, #fff, transparent),
+                radial-gradient(1px 1px at 300px 80px, #eee, transparent),
+                radial-gradient(2px 2px at 350px 200px, #ddd, transparent),
+                radial-gradient(3px 3px at 450px 120px, #fff, transparent),
+                radial-gradient(1px 1px at 500px 250px, #eee, transparent),
+                radial-gradient(2px 2px at 600px 100px, #ddd, transparent),
+                radial-gradient(2px 2px at 750px 400px, #f8f8ff, transparent),
+                radial-gradient(1px 1px at 880px 520px, #fff, transparent),
+                radial-gradient(3px 3px at 950px 300px, #eef, transparent);
+            background-repeat: repeat;
+            z-index: -1;
+            animation: 
+                twinkle 8s infinite alternate,
+                starsMove 20s infinite linear;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(1px 1px at 80px 120px, #bbf, transparent),
+                radial-gradient(2px 2px at 150px 200px, #ccf, transparent),
+                radial-gradient(1px 1px at 250px 80px, #aaf, transparent),
+                radial-gradient(2px 2px at 320px 280px, #ddf, transparent),
+                radial-gradient(1px 1px at 420px 150px, #bbf, transparent),
+                radial-gradient(2px 2px at 500px 320px, #ccf, transparent),
+                radial-gradient(2px 2px at 670px 450px, #9cf, transparent),
+                radial-gradient(1px 1px at 800px 620px, #adf, transparent);
+            background-repeat: repeat;
+            z-index: -1;
+            animation: 
+                twinkle2 5s infinite alternate,
+                starsMove2 25s infinite linear reverse;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.9; }
+        }
+
+        @keyframes twinkle2 {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes starsMove {
+            0% { background-position: 0px 0px; }
+            100% { background-position: 200px 100px; }
+        }
+
+        @keyframes starsMove2 {
+            0% { background-position: 0px 0px; }
+            100% { background-position: -150px -80px; }
+        }
+
+        .star-particle {
+            position: fixed;
+            width: 2px;
+            height: 2px;
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: 0 0 5px 1px rgba(255, 255, 255, 0.6);
+            z-index: -1;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.7;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(var(--particle-offset, 0px));
+                opacity: 0;
+            }
+        }
+
+        /* ---------- 导航栏样式 ---------- */
+        .nav {
+            z-index: 20;
+        }
+        .nav-right {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .nav-item {
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: rgba(200, 220, 255, 0.8);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(63, 81, 181, 0.5);
+            font-size: 0.95rem;
+            white-space: nowrap;
+            text-decoration: none;
+        }
+        .nav-item:hover {
+            color: #e0f0ff;
+            background: rgba(63, 81, 181, 0.2);
+            transform: translateY(-4px);
+            text-shadow: 0 0 8px rgba(100, 180, 255, 0.8);
+            border-color: rgba(63, 81, 181, 0.8);
+        }
+        .login-icon {
+            margin-right: 5px;
+            font-size: 0.9rem;
+        }
+
+        /* ---------- 主内容区布局 ---------- */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            text-align: left;
+            margin-bottom: 2rem;
+            padding: 0.5rem 0.5rem;
+            animation: fadeInUp 0.9s ease-out;
+            gap: 1rem;
+        }
+
+        .hero-title {
+            font-size: 3.0rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FFFFFF, #B0C4FF, #7B8FFF);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+            letter-spacing: -0.5px;
+            margin: 0;
+        }
+
+        .hero-line {
+            width: 100%;
+            height: 2px;
+            background: #3f51b5;
+            margin: 0.1rem 0 0.2rem;
+            border-radius: 2px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: #ccd9ff;
+            max-width: 680px;
+            margin: 0 auto;
+            backdrop-filter: blur(4px);
+            background: rgba(10, 20, 40, 0.3);
+            display: inline-block;
+            padding: 0.3rem 1.4rem;
+            border-radius: 60px;
+            font-weight: 400;
+            border: 1px solid rgba(120, 150, 255, 0.3);
+        }
+
+        /* 卡片网格 */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* 单个卡片样式 */
+        .sim-card {
+            background: rgba(12, 20, 35, 0.65);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 1rem 1rem 1.2rem;
+            transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            border: 1px solid rgba(80, 120, 255, 0.3);
+            box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.4);
+            cursor: default;
+            position: relative;
+            overflow-y: auto;
+            word-break: break-word;
+            scrollbar-width: thin;
+            height: 200px;
+            text-decoration: none;
+            display: block;
+        }
+
+        /* 仅带链接的卡片显示手型指针 */
+        a.sim-card {
+            cursor: pointer !important;
+        }
+
+        /* 自定义滚动条 */
+        .sim-card::-webkit-scrollbar {
+            width: 4px;
+            background: rgba(30, 40, 70, 0.5);
+            border-radius: 4px;
+        }
+        .sim-card::-webkit-scrollbar-thumb {
+            background: #5f7bc0;
+            border-radius: 4px;
+        }
+        .sim-card::-webkit-scrollbar-thumb:hover {
+            background: #8aa2e6;
+        }
+
+        /* 杨氏双缝干涉专用样式：取消滚动条并自适应高度 */
+        .sim-card.no-scroll {
+            overflow-y: visible !important;
+            overflow-x: visible !important;
+            height: auto !important;
+            min-height: 200px;
+            scrollbar-width: none;
+        }
+        .sim-card.no-scroll::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            background: transparent;
+        }
+
+        .sim-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 20%, rgba(100, 150, 255, 0.15), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s;
+            pointer-events: none;
+            border-radius: 24px;
+        }
+
+        .sim-card:hover {
+            transform: translateY(-6px);
+            background: rgba(18, 28, 48, 0.78);
+            border-color: rgba(100, 150, 255, 0.7);
+            box-shadow: 0 20px 32px -12px rgba(0, 20, 60, 0.6);
+        }
+
+        .sim-card:hover::before {
+            opacity: 1;
+        }
+
+        /* 卡片标题 */
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.7rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed rgba(100, 150, 255, 0.4);
+        }
+
+        .card-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            letter-spacing: -0.2px;
+            color: #66ccff;
+            line-height: 1.2;
+            text-align: center;
+            word-break: break-word;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            line-height: 1.45;
+            color: #e0eaff;
+            margin-top: 0.5rem;
+            padding-left: 0.2rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .card-tag {
+            display: inline-block;
+            margin-top: 0.8rem;
+            font-size: 0.65rem;
+            background: rgba(70, 130, 255, 0.2);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            color: #bbd4ff;
+            border: 0.5px solid rgba(100, 150, 255, 0.4);
+            backdrop-filter: blur(2px);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cards-grid .sim-card {
+            animation: fadeInUp 0.5s ease-out backwards;
+        }
+
+        .cards-grid .sim-card:nth-child(1) { animation-delay: 0.05s; }
+        .cards-grid .sim-card:nth-child(2) { animation-delay: 0.1s; }
+        .cards-grid .sim-card:nth-child(3) { animation-delay: 0.15s; }
+        .cards-grid .sim-card:nth-child(4) { animation-delay: 0.2s; }
+        .cards-grid .sim-card:nth-child(5) { animation-delay: 0.25s; }
+        .cards-grid .sim-card:nth-child(6) { animation-delay: 0.3s; }
+        .cards-grid .sim-card:nth-child(7) { animation-delay: 0.35s; }
+        .cards-grid .sim-card:nth-child(8) { animation-delay: 0.4s; }
+        .cards-grid .sim-card:nth-child(9) { animation-delay: 0.45s; }
+        .cards-grid .sim-card:nth-child(10) { animation-delay: 0.5s; }
+        .cards-grid .sim-card:nth-child(11) { animation-delay: 0.55s; }
+        .cards-grid .sim-card:nth-child(12) { animation-delay: 0.6s; }
+
+        /* 响应式 */
+        @media (max-width: 900px) {
+            .main-container {
+                padding: 1.5rem 1rem 2rem;
+            }
+            .hero-title {
+                font-size: 2rem;
+            }
+            .hero-line {
+                max-width: 100%;
+                margin: 0.2rem auto 0.2rem;
+            }
+            .sim-card {
+                padding: 0.8rem 0.8rem 1rem;
+                height: 320px;
+            }
+            .sim-card.no-scroll {
+                height: auto !important;
+                min-height: 280px;
+            }
+            .card-title {
+                font-size: 1.2rem;
+            }
+            .card-desc {
+                font-size: 0.8rem;
+            }
+            .card-tag {
+                font-size: 0.6rem;
+                margin-top: 0.6rem;
+            }
+            .cards-grid {
+                gap: 0.8rem;
+            }
+            .nav-item {
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .sim-card {
+                padding: 0.7rem 0.6rem 0.9rem;
+                height: 280px;
+            }
+            .sim-card.no-scroll {
+                height: auto !important;
+                min-height: 260px;
+            }
+            .card-header {
+                margin-bottom: 0.5rem;
+                padding-bottom: 0.4rem;
+            }
+            .card-title {
+                font-size: 1rem;
+            }
+            .card-desc {
+                font-size: 0.7rem;
+                line-height: 1.4;
+                margin-top: 0.4rem;
+            }
+            .card-tag {
+                font-size: 0.55rem;
+                padding: 0.15rem 0.5rem;
+                margin-top: 0.5rem;
+            }
+            .cards-grid {
+                gap: 0.6rem;
+            }
+            .hero-title {
+                font-size: 1.6rem;
+            }
+            .hero-line {
+                height: 2px;
+            }
+            .nav-right {
+                gap: 8px;
+            }
+            .nav-item {
+                padding: 4px 8px;
+                font-size: 0.75rem;
+            }
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: #98abdd;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.6rem;
+            border-radius: 40px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            backdrop-filter: blur(5px);
+        }
+
+        /* 联系我们弹窗样式 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .contact-card {
+            position: relative;
+            background: #121828;
+            padding: 40px 50px;
+            border-radius: 12px;
+            border: 1px solid rgba(156, 39, 176, 0.3);
+            min-width: 400px;
+            box-shadow: 0 0 30px rgba(79, 195, 247, 0.15);
+        }
+
+        .contact-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+        }
+
+        .contact-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(79, 195, 247, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #4fc3f7;
+            font-size: 18px;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .contact-label {
+            font-size: 16px;
+            color: #ccc;
+            font-weight: 50;
+        }
+
+        .contact-value {
+            font-size: 18px;
+            color: #fff;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #ccc;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+
+        .close-btn:hover {
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        /* 移动端弹窗适配 */
+        @media (max-width: 768px) {
+            .contact-card {
+                min-width: auto;
+                width: 90vw;
+                max-width: 400px;
+                padding: 25px 20px;
+            }
+            .close-btn {
+                top: 12px;
+                right: 12px;
+                font-size: 20px;
+            }
+            .contact-title {
+                font-size: 22px;
+                margin-bottom: 20px;
+            }
+            .contact-item {
+                gap: 12px;
+            }
+            .contact-icon {
+                width: 34px;
+                height: 34px;
+                font-size: 16px;
+            }
+            .contact-value {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="starParticles"></div>
+
+    <div class="main-container">
+        <div class="hero-section">
+            <h1 class="hero-title">缝隙间的光韵万象</h1>
+            <div class="nav">
+                <div class="nav-right">
+                    <a href="../index.html" class="nav-item" id="home-nav">首页</a>
+                    <a href="../pdf/实验介绍.pdf" class="nav-item" id="experiment-intro">实验介绍</a>
+                    <div class="nav-item" id="contact-us">联系我们</div>
+                </div>
+            </div>
+            <div class="hero-line"></div>
+        </div>
+
+        <div class="cards-grid" id="cardsContainer"></div>
+    </div>
+
+    <!-- 联系我们弹窗 -->
+    <div class="modal" id="contact-modal">
+        <div class="contact-card">
+            <i class="fa-solid fa-xmark close-btn" id="close-contact"></i>
+            <h2 class="contact-title">联系方式</h2>
+            <ul class="contact-list">
+                <li class="contact-item">
+                    <div class="contact-icon"><i class="fa-solid fa-envelope"></i></div>
+                    <div class="contact-info">
+                        <div class="contact-label">邮箱</div>
+                        <div class="contact-value">2604207854@qq.com</div>
+                    </div>
+                </li>
+                <li class="contact-item">
+                    <div class="contact-icon"><i class="fa-solid fa-phone"></i></div>
+                    <div class="contact-info">
+                        <div class="contact-label">电话</div>
+                        <div class="contact-value">+86 17861337708</div>
+                    </div>
+                </li>
+                <li class="contact-item">
+                    <div class="contact-icon"><i class="fa-solid fa-location-dot"></i></div>
+                    <div class="contact-info">
+                        <div class="contact-label">地址</div>
+                        <div class="contact-value">山东省济宁市</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+    
+        const experiments = [
+            {
+                title: "基础知识",
+                desc: "涵盖波动光学与量子力学的核心理论：波粒二象性、干涉衍射原理、衍射积分、量子相位、仿真实验与核心参数，为后续的进阶实验奠定理论支撑。",
+            },
+            {
+                title: "夫琅禾费单缝衍射",
+                desc: "平行光经单缝的远场衍射，光强分布呈现中央光强最大的零级衍射斑与两侧随级次快速衰减的次级大条纹，波动光学的基础实验。",
+            },
+            {
+                title: "单电子单缝衍射",
+                desc: "电子束通过单缝后发生衍射，展宽图样证实电子波动性，德布罗意波长的直接体现，奠定量子力学基础。",
+            },
+            {
+                title: "杨氏双缝干涉",
+                desc: "让一束光先通过单缝获得相干光，再通过两个平行狭缝，两缝作为次级点光源发出的子波在空间相遇发生相干干涉，在屏上形成等间距明暗条纹。",
+            },
+            {
+                title: "电子双缝干涉",
+                desc: "电子经双缝发生干涉，累积形成干涉条纹，验证电子波动性，揭示量子叠加态的核心物理本质。",
+            },
+            {
+                title: "阿哈罗诺夫-波姆效应",
+                desc: "电子在无电磁场区域运动时，因电磁势产生相位差，导致干涉条纹移动，表明电磁势具有可观测的物理效应，是量子力学的重要预言。",
+            },
+            {
+                title: "夫琅禾费多缝衍射",
+                desc: "多缝衍射受单缝衍射因子调制，比单缝衍射出现新的强度极大和极小，光栅公式控制同级主极强位置。",
+            },
+            {
+                title: "反射光栅衍射",
+                desc: "在平整金属表面刻制等间距平行槽纹构成反射式光栅，入射光经反射后发生多光束干涉，形成明亮尖锐的衍射光谱，满足光栅公式，广泛应用于光谱分析与波长精确测量领域。",
+            },
+            {
+                title: "X射线衍射",
+                desc: "X射线入射晶体后发生相干衍射，晶体作为三维光栅，衍射方向满足布拉格定律，通过衍射图样可解析晶体原子排列，是测定晶体结构的重要方法。",
+            },
+            {
+                title: "夫琅禾费矩形孔衍射",
+                desc: "二维远场平行光衍射，单缝衍射的二维推广，形成十字对称的二维衍射光斑，相对强度分布是两个单缝衍射因子的乘积。",
+            },
+            {
+                title: "光的偏振",
+                desc: "自然光通过偏振片后成为线偏振光，再经1/4波片可转变为椭圆偏振光或圆偏振光。通过波片与偏振片的组合，可实现不同偏振态之间的转换，验证光的横波特性。",
+            },
+            {
+                title: "牛顿环干涉",
+                desc: "平凸透镜与平板玻璃间形成空气薄膜，单色光入射后产生等厚干涉，呈现同心圆环状条纹，是等厚干涉的典型装置，可用于测量透镜曲率半径。",
+            }
+        ];
+
+        // 链接映射表 (已删除“自定义孔衍射”，反射光栅衍射改为指向夫琅禾费多缝衍射实验.html中的反射光栅仿真锚点)
+        const linkMap = {
+            "基础知识": "基础知识.html",
+            "夫琅禾费单缝衍射": "夫琅禾费单缝衍射实验.html",
+            "单电子单缝衍射": "单电子单缝衍射实验.html",
+            "杨氏双缝干涉": "杨氏双缝干涉实验.html",
+            "电子双缝干涉": "电子双缝干涉实验.html",
+            "阿哈罗诺夫-波姆效应": "电子双缝干涉实验.html#实验原理（A-B效应）",
+            "夫琅禾费多缝衍射": "夫琅禾费多缝衍射实验.html",
+            // 关键修改：反射光栅衍射卡片跳转到夫琅禾费多缝衍射实验.html 中 “实验仿真仿真（反射光栅）” 部分
+            "反射光栅衍射": "夫琅禾费多缝衍射实验.html#实验仿真仿真（反射光栅）",
+            "X射线衍射": "X射线衍射实验.html",
+            "夫琅禾费矩形孔衍射": "夫琅禾费矩形孔衍射.html",
+            "光的偏振": "光的偏振实验.html",
+            "牛顿环干涉": "牛顿环干涉实验.html"
+        };
+
+        // 为“杨氏双缝干涉”卡片特殊应用 no-scroll 类（内容较多，取消滚动条）
+        function shouldAddNoScrollClass(title) {
+            return title === "杨氏双缝干涉";
+        }
+
+        function renderCards() {
+            const container = document.getElementById('cardsContainer');
+            if (!container) return;
+            let cardsHTML = '';
+            
+            experiments.forEach(exp => {
+                const title = exp.title;
+                const desc = exp.desc;
+                const hasLink = linkMap.hasOwnProperty(title);
+                const targetUrl = hasLink ? linkMap[title] : null;
+                const needNoScroll = shouldAddNoScrollClass(title);
+                
+                // 卡片主体内容
+                const cardContent = `
+                    <div class="card-header">
+                        <div class="card-title">${title}</div>
+                    </div>
+                    <div class="card-desc">${desc}</div>
+                `;
+                
+                // 构建class
+                let cardClass = "sim-card";
+                if (needNoScroll) {
+                    cardClass += " no-scroll";
+                }
+                
+                if (hasLink && targetUrl) {
+                    // 带链接的可跳转卡片（反射光栅衍射将正确跳转到多缝衍射页面的反射光栅仿真部分）
+                    cardsHTML += `<a href="${targetUrl}" class="${cardClass}">${cardContent}</a>`;
+                } else {
+                    // 无链接卡片（防御）
+                    cardsHTML += `<div class="${cardClass}">${cardContent}</div>`;
+                }
+            });
+            
+            container.innerHTML = cardsHTML;
+        }
+
+        // 动态生成漂浮星尘
+        function createStarParticles() {
+            const container = document.getElementById('starParticles');
+            if (!container) return;
+            container.innerHTML = '';
+            const particleCount = 65;
+            for (let i = 0; i < particleCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star-particle';
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const size = Math.random() * 3 + 1;
+                const delay = Math.random() * 6;
+                const duration = Math.random() * 12 + 8;
+                const offset = (Math.random() - 0.5) * 120;
+                star.style.left = `${x}vw`;
+                star.style.top = `${y}vh`;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.setProperty('--particle-offset', `${offset}px`);
+                star.style.animation = `particleFloat ${duration}s ${delay}s infinite linear`;
+                const brightness = 0.5 + Math.random() * 0.5;
+                star.style.backgroundColor = `rgba(255, 240, 210, ${brightness})`;
+                star.style.boxShadow = `0 0 ${size * 1.5}px rgba(180, 200, 255, 0.7)`;
+                container.appendChild(star);
+            }
+        }
+        
+        // 流星划过的动态效果
+        function addShootingStarEffect() {
+            setInterval(() => {
+                const container = document.getElementById('starParticles');
+                if (!container) return;
+                const shooting = document.createElement('div');
+                shooting.className = 'star-particle';
+                const size = Math.random() * 4 + 2;
+                const startX = Math.random() * 90;
+                shooting.style.left = `${startX}vw`;
+                shooting.style.top = `-5vh`;
+                shooting.style.width = `${size}px`;
+                shooting.style.height = `${size}px`;
+                shooting.style.backgroundColor = `rgba(255, 220, 160, 0.9)`;
+                shooting.style.boxShadow = `0 0 8px 2px rgba(255, 200, 100, 0.8)`;
+                const offsetVal = (Math.random() - 0.5) * 80;
+                shooting.style.setProperty('--particle-offset', `${offsetVal}px`);
+                const duration = Math.random() * 6 + 4;
+                shooting.style.animation = `particleFloat ${duration}s linear forwards`;
+                container.appendChild(shooting);
+                shooting.addEventListener('animationend', () => {
+                    if(shooting && shooting.remove) shooting.remove();
+                });
+            }, 12000);
+        }
+
+        // 保证卡片标题居中（样式防御）
+        function enforceCardTitleCentering() {
+            const headers = document.querySelectorAll('.card-header');
+            headers.forEach(header => {
+                if (window.getComputedStyle(header).justifyContent !== 'center') {
+                    header.style.justifyContent = 'center';
+                }
+            });
+            const titles = document.querySelectorAll('.card-title');
+            titles.forEach(title => {
+                if (window.getComputedStyle(title).textAlign !== 'center') {
+                    title.style.textAlign = 'center';
+                }
+            });
+        }
+
+        // 联系我们弹窗交互
+        function bindContactModal() {
+            const contactModal = document.getElementById('contact-modal');
+            const contactBtn = document.getElementById('contact-us');
+            const closeBtn = document.getElementById('close-contact');
+
+            if (contactBtn) {
+                contactBtn.onclick = () => {
+                    contactModal.style.display = 'flex';
+                };
+            }
+
+            if (closeBtn) {
+                closeBtn.onclick = () => {
+                    contactModal.style.display = 'none';
+                };
+            }
+
+            if (contactModal) {
+                contactModal.onclick = (e) => {
+                    if (e.target === contactModal) {
+                        contactModal.style.display = 'none';
+                    }
+                };
+            }
+        }
+
+        // 初始化所有功能
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCards();            
+            createStarParticles();    
+            addShootingStarEffect();  
+            enforceCardTitleCentering();
+            bindContactModal();
+        });
+    </script>
+</body>
+</html>

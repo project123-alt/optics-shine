@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X射线衍射实验</title>
+<!-- 公式渲染 -->
+<script id="MathJax-script" async src="../es5/tex-mml-svg.js">
+</script>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+  },
+  svg: {
+    fontCache: 'global'
+  }
+};
+</script>
+<style>
+/* 所有CSS样式保持不变 (完全来自原始代码，仅微调图片容器) */
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+}
+
+.MathJax, mjx-container, mjx-math {
+  color: #66ccff !important;
+  font-weight: bold !important;
+}
+
+mjx-math {
+  color: #66ccff !important;
+  font-weight: bold !important;
+}
+
+.mjx-chtml mjx-math {
+  color: #66ccff !important;
+  font-weight: bold !important;
+}
+
+mjx-container[jax="CHTML"][display="false"] {
+  color: #66ccff !important;
+  font-weight: bold !important;
+}
+
+body {
+background:
+radial-gradient(circle at 10% 20%, rgba(20, 30, 80, 0.8) 0%, transparent 30%),
+radial-gradient(circle at 90% 30%, rgba(40, 20, 90, 0.7) 0%, transparent 40%),
+radial-gradient(circle at 50% 80%, rgba(30, 40, 100, 0.6) 0%, transparent 35%),
+linear-gradient(to bottom, #0a0e2a, #1a1f3a, #2d3250);
+color: #e0e0ff;
+line-height: 1.6;
+min-height: 100vh;
+background-attachment: fixed;
+position: relative;
+overflow-x: hidden;
+animation: skyMove 30s infinite alternate ease-in-out;
+padding-top: 70px;
+}
+
+@keyframes skyMove {
+0% { background-position: 0% 0%, 100% 0%, 50% 100%; }
+100% { background-position: 10% 20%, 90% 30%, 50% 80%; }
+}
+
+body::before {
+content: '';
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-image:
+radial-gradient(2px 2px at 20px 30px, #eee, transparent),
+radial-gradient(2px 2px at 40px 70px, #fff, transparent),
+radial-gradient(3px 3px at 120px 180px, #ddd, transparent),
+radial-gradient(2px 2px at 200px 150px, #fff, transparent),
+radial-gradient(1px 1px at 300px 80px, #eee, transparent),
+radial-gradient(2px 2px at 350px 200px, #ddd, transparent),
+radial-gradient(3px 3px at 450px 120px, #fff, transparent),
+radial-gradient(1px 1px at 500px 250px, #eee, transparent),
+radial-gradient(2px 2px at 600px 100px, #ddd, transparent);
+background-repeat: repeat;
+z-index: -1;
+animation:
+twinkle 8s infinite alternate,
+starsMove 20s infinite linear;
+opacity: 0.7;
+}
+
+body::after {
+content: '';
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-image:
+radial-gradient(1px 1px at 80px 120px, #bbf, transparent),
+radial-gradient(2px 2px at 150px 200px, #ccf, transparent),
+radial-gradient(1px 1px at 250px 80px, #aaf, transparent),
+radial-gradient(2px 2px at 320px 280px, #ddf, transparent),
+radial-gradient(1px 1px at 420px 150px, #bbf, transparent),
+radial-gradient(2px 2px at 500px 320px, #ccf, transparent);
+background-repeat: repeat;
+z-index: -1;
+animation:
+twinkle2 5s infinite alternate,
+starsMove2 25s infinite linear reverse;
+opacity: 0.5;
+}
+
+@keyframes twinkle { 0%,100% { opacity: 0.5; } 50% { opacity: 0.9; } }
+@keyframes twinkle2 { 0%,100% { opacity: 0.3; } 50% { opacity: 0.7; } }
+@keyframes starsMove { 0% { background-position: 0px 0px; } 100% { background-position: 200px 100px; } }
+@keyframes starsMove2 { 0% { background-position: 0px 0px; } 100% { background-position: -150px -80px; } }
+
+.star-particle {
+position: fixed;
+width: 2px;
+height: 2px;
+background-color: white;
+border-radius: 50%;
+box-shadow: 0 0 5px 1px rgba(255, 255, 255, 0.8);
+z-index: -1;
+opacity: 0;
+}
+
+.main-container {
+max-width: 1200px;
+margin: 0 auto;
+padding: 20px;
+position: relative;
+z-index: 1;
+}
+
+.nav-container {
+background-color: rgba(20, 25, 50, 0.95);
+border-radius: 0 0 12px 12px;
+padding: 15px 30px;
+backdrop-filter: blur(15px);
+border: 1px solid rgba(255, 255, 255, 0.1);
+border-top: none;
+box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+z-index: 1000;
+animation: navFloat 8s ease-in-out infinite;
+}
+
+@keyframes navFloat { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-3px); } }
+
+.nav-list {
+display: flex;
+justify-content: center;
+list-style: none;
+flex-wrap: wrap;
+gap: 15px;
+}
+
+.nav-item {
+padding: 10px 20px;
+border-radius: 8px;
+cursor: pointer;
+transition: all 0.3s ease;
+font-weight: 600;
+display: flex;
+align-items: center;
+background: linear-gradient(135deg, rgba(63, 81, 181, 0.3), rgba(30, 34, 60, 0.8));
+border: 1px solid rgba(100, 120, 255, 0.3);
+}
+
+.nav-item:hover {
+background: linear-gradient(135deg, rgba(80, 100, 220, 0.5), rgba(50, 54, 85, 0.9));
+transform: translateY(-3px);
+border-color: rgba(100, 120, 255, 0.6);
+box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+.nav-item.active {
+background: linear-gradient(135deg, rgba(63, 81, 181, 0.7), rgba(40, 45, 80, 0.9));
+border-color: rgba(100, 120, 255, 0.8);
+}
+
+.nav-dot {
+width: 12px;
+height: 12px;
+border-radius: 50%;
+margin-right: 10px;
+}
+
+/* 为“返回首页”设置专属圆点颜色（橙色系，区别于其他） */
+.nav-item:first-child .nav-dot { background-color: #ff884d; }
+.nav-item:nth-child(2) .nav-dot { background-color: #ffcc00; }
+.nav-item:nth-child(3) .nav-dot { background-color: #4caf50; }
+.nav-item:nth-child(4) .nav-dot { background-color: #66ccff; }
+.nav-item:nth-child(5) .nav-dot { background-color: #bf2ee7; }
+
+.main-title {
+text-align: center;
+font-size: 2.8rem;
+color: #ffffff;
+margin-bottom: 30px;
+padding-bottom: 15px;
+border-bottom: 2px solid #3f51b5;
+text-shadow: 0 0 15px rgba(63, 81, 181, 0.7);
+letter-spacing: 1px;
+animation: titleGlow 4s ease-in-out infinite;
+font-weight: 700;
+}
+
+@keyframes titleGlow { 0%,100% { text-shadow: 0 0 15px rgba(63, 81, 181, 0.7); } 50% { text-shadow: 0 0 25px rgba(63, 81, 181, 0.9), 0 0 35px rgba(63, 81, 181, 0.6); } }
+
+.content-section {
+background-color: rgba(255, 255, 255, 0.08);
+border-radius: 15px;
+padding: 30px;
+backdrop-filter: blur(10px);
+border: 1px solid rgba(255, 255, 255, 0.15);
+margin-bottom: 40px;
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+transition: transform 0.3s ease;
+}
+
+.content-section:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); }
+
+.section-title {
+font-size: 2.2rem;
+color: #ffffff;
+margin-bottom: 25px;
+padding-bottom: 15px;
+border-bottom: 2px solid #3f51b5;
+text-shadow: 0 0 10px rgba(63, 81, 181, 0.5);
+font-weight: 600;
+}
+
+.definition-four-columns {
+display: flex;
+flex-wrap: wrap;
+gap: 20px;
+margin-bottom: 20px;
+}
+
+.definition-column {
+flex: 1;
+min-width: 250px;
+background: linear-gradient(135deg, rgba(30, 35, 60, 0.9), rgba(20, 25, 50, 0.8));
+padding: 20px;
+border-radius: 12px;
+box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+display: flex;
+flex-direction: column;
+transition: transform 0.3s ease;
+border: 1px solid rgba(63, 81, 181, 0.2);
+}
+
+.definition-column:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4); border-color: rgba(63, 81, 181, 0.4); }
+
+.definition-column:first-child { display: flex; justify-content: center; align-items: center; padding: 0; }
+
+.definition-image { width: 80%; height: 90%; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; }
+.definition-image img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; transition: transform 0.5s ease; }
+.definition-image:hover img { transform: scale(1.03); }
+
+.definition-title { font-size: 1.4rem; color: #ffffff; margin-bottom: 15px; border-left: 4px solid #3f51b5; padding-left: 12px; font-weight: 600; }
+.definition-content { color: #d0d5ff; line-height: 1.7; flex-grow: 1; font-size: 1.08rem; text-align: justify; }
+
+.principle-layout, .operation-layout { position: relative; }
+.intro-with-image { display: flex; gap: 40px; margin-bottom: 30px; align-items: center; }
+.intro-text { flex: 0; display: none; }
+.intro-image { flex: 1; display: flex; justify-content: center; }
+.intro-image .principle-img-wrapper { width: 100%; margin: 0; max-width: 800px; }
+.principle-img-wrapper { border-radius: 12px; padding: 0; background: transparent; box-shadow: none; overflow: hidden; display: flex; justify-content: center; }
+.principle-img-wrapper img { width: 100%; height: 410px; object-fit: cover; border-radius: 10px; display: block; }
+
+.detail-text { font-size: 1.1rem; line-height: 1.8; color: #d0d5ff; text-align: justify; }
+.detail-text h3 { color: #ffffff; margin: 25px 0 15px; font-size: 1.5rem; border-left: 4px solid #3f51b5; padding-left: 15px; font-weight: 600; }
+.detail-text h3:first-of-type { clear: none; margin-top: 0; }
+.detail-text p { margin-bottom: 1px; }
+.detail-text ul, .detail-text ol { margin-left: 20px; margin-bottom: 20px; }
+
+.principle-points-two-rows { display: flex; flex-direction: column; gap: 30px; margin: 30px 0; }
+.principle-point-row { display: flex; flex-wrap: wrap; gap: 25px; }
+.principle-point-row .principle-point { flex: 1 1 calc(50% - 25px); min-width: 280px; background: linear-gradient(135deg, rgba(30, 35, 60, 0.9), rgba(40, 45, 75, 0.8)); padding: 22px; border-radius: 12px; border-left: 4px solid #4caf50; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); transition: transform 0.3s ease; display: flex; flex-direction: column; border: 1px solid rgba(76, 175, 80, 0.2); }
+.principle-point:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); border-color: rgba(76, 175, 80, 0.4); }
+.principle-point h4 { color: #ffffff; margin-bottom: 15px; font-size: 1.3rem; border-bottom: 2px solid rgba(76, 175, 80, 0.7); padding-bottom: 10px; font-weight: 700; text-shadow: 0 0 8px rgba(76, 175, 80, 0.3); }
+.principle-point p { color: #d0d5ff; line-height: 1.7; font-size: 1.05rem; flex-grow: 1; }
+
+/* 调整图片容器边距，减小上下边距 */
+.principle-point-image { width: 100%; margin: 8px 0; text-align: center; }
+.principle-point-image img { max-width: 100%; border-radius: 8px; border: 2px solid rgba(76, 175, 80, 0.3); background: rgba(0,0,0,0.2); }
+
+.principle-formula { background: linear-gradient(135deg, rgba(20, 25, 50, 0.9), rgba(30, 35, 65, 0.8)); padding: 10px 12px; border-radius: 10px; margin-top: 8px; margin-bottom: 8px; border-left: 3px solid #3f51b5; border-right: 3px solid #3f51b5; color: #66ccff; font-weight: bold; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); animation: formulaGlow 5s infinite alternate; line-height: 1.4; }
+
+.highlight-main { background-color: rgba(100, 200, 255, 0.3); color: #ffffff; padding: 2px 6px; border-radius: 4px; font-weight: 700; border: 1px solid rgba(100, 200, 255, 0.6); display: inline; white-space: normal; word-break: keep-all; }
+.highlight-secondary { background-color: rgba(255, 200, 100, 0.3); color: #fff8e1; padding: 2px 6px; border-radius: 4px; font-weight: 700; border: 1px solid rgba(255, 200, 100, 0.6); display: inline; }
+.highlight-important { background-color: rgba(100, 200, 255, 0.4); color: #e0f0ff; padding: 2px 6px; border-radius: 4px; font-weight: 700; border: 1px solid rgba(100, 200, 255, 0.7); display: inline; }
+
+.formula { background: linear-gradient(135deg, rgba(20, 25, 50, 0.9), rgba(30, 35, 65, 0.8)); padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #3f51b5; border-right: 4px solid #3f51b5; color: #66ccff; font-weight: bold; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); clear: both; animation: formulaGlow 5s infinite alternate; }
+@keyframes formulaGlow { 0% { box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); } 100% { box-shadow: 0 6px 20px rgba(63, 81, 181, 0.5); } }
+
+.step { background: linear-gradient(135deg, rgba(30, 35, 60, 0.9), rgba(40, 45, 75, 0.8)); padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #4caf50; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); clear: both; }
+
+.application-layout { display: flex; gap: 30px; margin-top: 25px; align-items: center; clear: both; }
+.application-image-container { flex: 1; border: 1px solid rgba(63, 81, 181, 0.4); border-radius: 12px; padding: 18px; background: linear-gradient(135deg, rgba(20, 25, 50, 0.9), rgba(30, 35, 70, 0.8)); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); text-align: center; min-width: 300px; display: flex; align-items: center; justify-content: center; min-height: 200px; }
+.application-image-container img { max-width: 100%; max-height: 180px; border-radius: 10px; }
+.application-step { flex: 1; min-width: 300px; background: linear-gradient(135deg, rgba(30, 35, 60, 0.9), rgba(40, 45, 75, 0.8)); padding: 25px 20px; border-radius: 12px; border-left: 4px solid #4caf50; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); display: flex; align-items: center; justify-content: center; min-height: 150px; }
+.application-step p { margin: 0; width: 100%; font-size: 1.1rem; line-height: 1.6; }
+
+/* 新增：仅作用于原理应用.png的专属样式 */
+.special-application-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(63, 81, 181, 0.4);
+  border-radius: 12px;
+  padding: 18px;
+  background: linear-gradient(135deg, rgba(20, 25, 50, 0.9), rgba(30, 35, 70, 0.8));
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  min-width: 300px;
+  min-height: 250px;
+}
+.special-application-container img {
+  max-width: 100%;
+  max-height: 220px;
+  border-radius: 10px;
+}
+
+.operation-steps-vertical { display: flex; flex-direction: column; gap: 25px; margin: 30px 0; }
+.operation-step-vertical { background: linear-gradient(135deg, rgba(30, 35, 60, 0.9), rgba(40, 45, 75, 0.8)); padding: 22px; border-radius: 12px; border-left: 4px solid #66ccff; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); display: flex; align-items: flex-start; transition: transform 0.3s ease; border: 1px solid rgba(102, 204, 255, 0.2); width: 100%; }
+.operation-step-vertical:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); border-color: rgba(102, 204, 255, 0.4); }
+.operation-step-number { display: inline-block; background: linear-gradient(135deg, #66ccff, #3399ff); color: white; width: 36px; height: 36px; border-radius: 50%; text-align: center; line-height: 36px; margin-right: 18px; font-weight: bold; box-shadow: 0 0 12px rgba(102, 204, 255, 0.6); flex-shrink: 0; font-size: 1.1rem; }
+.operation-content { flex: 1; }
+
+/* 操作步骤按钮（如"入射光波长"）的默认样式 */
+.operation-button {
+    background: linear-gradient(135deg, rgba(63, 81, 181, 0.3), rgba(80, 100, 220, 0.4));
+    color: #a5b6ff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    display: inline-block;
+    margin: 0 6px;
+    border: 1px solid rgba(63, 81, 181, 0.5);
+    transition: all 0.3s;
+    font-size: 1rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* 按钮发光动画（已定义，可按需给按钮添加animation属性启用） */
+@keyframes buttonGlow { 
+    0%,100% { box-shadow: 0 0 5px rgba(63, 81, 181, 0.3); } 
+    50% { box-shadow: 0 0 10px rgba(63, 81, 181, 0.6); } 
+}
+
+/* 按钮hover交互样式（鼠标悬浮时的效果） */
+.operation-button:hover {
+    background: linear-gradient(135deg, rgba(63, 81, 181, 0.5), rgba(80, 100, 220, 0.6));
+    color: #ffffff;
+    transform: scale(1.05);
+}
+
+.observation-tip { color: #b0b5ff; font-size: 0.95rem; margin: 12px 0 0 0; line-height: 1.6; background-color: rgba(30, 35, 60, 0.7); padding: 12px 15px; border-radius: 6px; border-left: 3px solid #4caf50; width: 100%; display: block; box-sizing: border-box; clear: both; }
+.observation-tip strong { color: #4caf50; margin-right: 8px; }
+
+/* 新增仿真模块专用样式 */
+.mica-bottom-layout {display: flex;flex-wrap: wrap;gap: 30px;width: 100%;box-sizing: border-box;margin-top: 20px;}
+.mica-bottom-layout .control-panel,.mica-bottom-layout .display-panel {
+    flex:1;min-width:300px;background:linear-gradient(135deg,rgba(20,25,50,0.95),rgba(30,35,65,0.9));padding:25px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.4);width:100%;box-sizing:border-box;
+}
+.mica-bottom-layout .display-panel {flex:2;min-width:600px;border:1px solid rgba(76,175,80,0.4);}
+.mica-bottom-layout .control-panel {border:1px solid rgba(63,81,181,0.4);}
+.control-group {margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.1);}
+.control-group label {display:block;color:#e0e0ff;margin-bottom:8px;font-weight:600;font-size:1.05rem;}
+.slider-edit-group {display:flex;align-items:center;gap:12px;margin-bottom:5px;}
+.slider-container {width:200px;flex:none;}
+.slider-edit-group input[type="range"] {
+    width:100%;height:10px;-webkit-appearance:none;appearance:none;background:linear-gradient(to right,rgba(30,35,60,0.8),rgba(63,81,181,0.8));border-radius:5px;outline:none;
+}
+.slider-edit-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#3f51b5,#667eea);cursor:pointer;box-shadow:0 0 12px rgba(63,81,181,0.9);border:2px solid #fff;transition:0.2s;
+}
+.slider-edit-group input[type="range"]::-webkit-slider-thumb:hover {transform:scale(1.1);box-shadow:0 0 15px rgba(63,81,181,1);}
+.edit-container {width:70px;height:40px;display:flex;align-items:center;justify-content:center;}
+.slider-edit-group input[type="number"] {
+    width:100%;height:36px;padding:8px 10px;border-radius:6px;background:rgba(15,20,45,0.9);border:1px solid rgba(63,81,181,0.6);color:#fff;font-size:1rem;font-weight:500;text-align:center;-moz-appearance:textfield;appearance:textfield;
+}
+.slider-edit-group input[type="number"]::-webkit-inner-spin-button,.slider-edit-group input[type="number"]::-webkit-outer-spin-button {-webkit-appearance:none;margin:0;}
+.unit-label {color:#a5b6ff;font-size:0.9rem;margin-left:5px;font-weight:600;}
+.control-panel h3 {color:#fff;margin-bottom:15px;font-size:1.6rem;border-bottom:2px solid rgba(63,81,181,0.8);padding-bottom:10px;font-weight:700;text-align:center;}
+.crystal-type-buttons {display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
+.crystal-button {
+    padding:10px 16px;border-radius:8px;border:1px solid rgba(63,81,181,0.5);background:linear-gradient(135deg,rgba(63,81,181,0.4),rgba(80,100,220,0.5));color:#a5b6ff;font-weight:600;cursor:pointer;transition:all 0.3s ease;flex:1;font-size:1rem;text-align:center;box-shadow:0 4px 10px rgba(0,0,0,0.2);height:40px;line-height:20px;box-sizing:border-box;white-space:nowrap;
+}
+@media (max-width:550px) {.crystal-button {font-size:0.85rem;padding:10px 8px;white-space:normal;line-height:1.2;height:auto;min-height:40px;}}
+.crystal-button.active {background:linear-gradient(135deg,rgba(63,81,181,0.8),rgba(80,100,220,0.9));color:#fff;border-color:rgba(63,81,181,0.8);box-shadow:0 0 15px rgba(63,81,181,0.5);}
+.crystal-button:hover:not(.active) {background:linear-gradient(135deg,rgba(63,81,181,0.6),rgba(80,100,220,0.7));color:#fff;transform:translateY(-2px);box-shadow:0 6px 15px rgba(0,0,0,0.3);}
+.canvas-container {margin-bottom:20px;background:rgba(10,15,35,0.95);border-radius:10px;padding:15px;border:2px solid rgba(63,81,181,0.5);box-shadow:0 4px 15px rgba(0,0,0,0.3);}
+.canvas-container h3 {color:#fff;margin-bottom:15px;font-size:1.4rem;text-align:center;font-weight:700;border-bottom:2px solid rgba(76,175,80,0.7);padding-bottom:10px;}
+.chart-container {width:100%;height:450px;background:rgba(5,10,25,0.9);border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);}
+canvas {width:100%;height:100%;display:block;}
+.current-params-below {margin-top:15px;padding:12px;background:rgba(15,20,45,0.7);border-radius:8px;border:1px solid rgba(255,255,255,0.15);text-align:center;}
+.current-params-below h4 {color:#fff;margin-bottom:8px;font-size:1.2rem;}
+.current-params-below p {color:#d0d5ff;font-size:0.9rem;line-height:1.5;}
+.math-formula {text-align:center;margin-top:15px;font-size:1.2rem;}
+@media (max-width:992px) {.mica-bottom-layout {flex-direction:column;}.mica-bottom-layout .control-panel,.mica-bottom-layout .display-panel {min-width:100%;}.chart-container {height:300px;}}
+
+.footer { text-align: center; margin-top: 50px; color: #a0a5ff; font-size: 1rem; padding: 25px; border-top: 1px solid rgba(255, 255, 255, 0.15); opacity: 0.9; }
+
+@media (max-width: 992px) {
+.definition-four-columns { flex-direction: column; }
+.definition-column { min-width: 100%; }
+.principle-point-row { flex-direction: column; }
+.principle-point-row .principle-point { min-width: 100%; }
+.intro-with-image { flex-direction: column; }
+.principle-img-wrapper img { height: 300px; }
+.nav-list { flex-direction: column; align-items: center; }
+.nav-item { width: 85%; }
+}
+
+/* 新增样式：使第7点衍射仪法操作步骤的列表符号颜色为 #3f51b5 */
+.step-list-color {
+  list-style-type: disc;
+}
+.step-list-color li::marker {
+  color: #3f51b5;
+}
+.principle-point-image img {
+    border: none !important;
+    background: none !important;
+}
+
+.application-image-container {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+.application-image-container img {
+    background: none !important;
+    border: none !important;
+}
+
+/* ========== 新增：物理现象说明样式（与杨氏双缝干涉实验完全一致） ========== */
+.physical-notes {
+    margin-top: 15px;
+    padding: 15px;
+    background: linear-gradient(135deg, rgba(30, 35, 60, 0.9), rgba(40, 45, 75, 0.8));
+    border-radius: 12px;
+    border-left: 4px solid #4caf50;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+.physical-notes h4 {
+    color: #ffffff;
+    margin-bottom: 12px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    text-align: center;
+    border-bottom: 2px solid rgba(76, 175, 80, 0.7);
+    padding-bottom: 8px;
+}
+.physical-notes ul {
+    color: #d0d5ff;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    padding-left: 20px;
+    margin: 0;
+}
+.physical-notes li {
+    margin-bottom: 8px;
+}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<div id="starParticles"></div>
+
+<div class="nav-container">
+<ul class="nav-list">
+<li class="nav-item active" onclick="scrollToSection('definition')"><div class="nav-dot"></div><span>实验背景</span></li>
+<li class="nav-item" onclick="scrollToSection('principle')"><div class="nav-dot"></div><span>实验原理</span></li>
+<li class="nav-item" onclick="scrollToSection('operation')"><div class="nav-dot"></div><span>操作方法</span></li>
+<li class="nav-item" onclick="scrollToSection('simulation')"><div class="nav-dot"></div><span>实验仿真</span></li>
+<li class="nav-item" onclick="location.href='../index.html'"><div class="nav-dot"></div><span>返回首页</span></li>
+</ul>
+</div>
+
+<div class="main-container">
+<h1 class="main-title">X射线衍射实验</h1>
+
+<!-- 实验背景：严格按照Word内容替换 -->
+<div id="definition" class="content-section">
+<h2 class="section-title">实验背景</h2>
+<div class="definition-four-columns">
+<div class="definition-column">
+<div class="definition-image"><img src="../images/XRD/roentgen.png" alt="伦琴"></div>
+</div>
+<div class="definition-column">
+<div class="definition-title">实验简介</div>
+<div class="definition-content">
+<p><span class="highlight-main">X射线衍射</span>（$XRD$）是研究晶体结构的重要技术。<span class="highlight-secondary">1895年</span>伦琴发现$X$射线，<span class="highlight-secondary">1912年</span>，劳厄首次观察到$X$射线在晶体中的衍射现象，随后布拉格父子提出布拉格定律，为晶体结构分析奠定了基础。$X$射线衍射利用$X$射线与晶体中周期性排列的原子的<span class="highlight-main">相干散射</span>，通过分析衍射图谱获得材料的物相、晶格常数、应力、取向等信息，广泛应用于材料科学、化学、矿物学等领域。</p>
+</div>
+</div>
+<div class="definition-column">
+<div class="definition-title">实验描述</div>
+<div class="definition-content">
+<p>$X$射线衍射是指当一定波长的$X$射线照射到晶体材料上时，由于晶体内部原子呈周期性规则排列（即晶格结构），$X$射线发生相干散射，并在满足布拉格定律的特定方向上产生相长干涉，从而<span class="highlight-main">形成衍射峰</span>的现象。</p>
+</div>
+</div>
+<div class="definition-column">
+<div class="definition-title">教学提示</div>
+<div class="definition-content">
+<p>掌握<span class="highlight-main">布拉格定律</span>的几何推导及其物理意义，理解衍射方向与晶体结构的关系；熟悉衍射强度的影响因素（如结构因子、多重性因子、角因子等）；能够根据衍射谱进行物相鉴定、晶格常数计算，并理解X射线与物质相互作用的基本过程。</p>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 实验原理：全部替换为Word内容，包括公式、列表及衍射仪法详细步骤 -->
+<div id="principle" class="content-section">
+<h2 class="section-title">实验原理</h2>
+<div class="principle-layout">
+<div class="intro-with-image">
+<div class="intro-text"></div>
+<div class="intro-image">
+<div class="principle-img-wrapper"><img src="../images/XRD/principle-diagram.png"  alt="X射线衍射实验原理图"></div>
+</div>
+</div>
+<div class="detail-text">
+<h3>实验原理</h3>
+<div class="principle-points-two-rows">
+<div class="principle-point-row">
+<div class="principle-point"><h4>1.$X$射线的产生与性质</h4><p><span class="highlight-secondary">X射线产生的条件</span>：</p><ul><li>以某种方式获得一定量的自由电子；</li><li>在高真空环境中，通过高压电场使电子加速至高速运动状态；</li><li>在电子运动路径上设置阳极靶使高速电子突然受阻而停止。</li></ul><p><span class="highlight-secondary">X射线的性质</span>：$X$射线是一种电磁波，波长范围约为0.01~100 Å，用于衍射分析的波长约为0.5~2.5 Å。$X$射线具有波粒二象性，穿透能力强，在常见介质中几乎不发生折射。在$X$射线管中，高速电子轰击金属靶（如$Cu$、$Mo$、$W$），电子动能大部分转化为热能，少部分转化为$X$射线。</p></div>
+<div class="principle-point"><h4>2. $X$射线与物质的相互作用</h4><p>$X$射线到达物质后，主要发生<span class="highlight-main">散射</span>、<span class="highlight-main">吸收</span>和<span class="highlight-main">透射</span>等现象。</p><p><span class="highlight-secondary">相干散射</span>：入射的$X$射线光子与原子中束缚较紧的内层电子发生弹性碰撞，光子方向改变，但能量几乎不变，波长不变，这种散射称为相干散射（汤姆孙散射）。相干散射是$X$射线在晶体中产生衍射的基础。</p><p><span class="highlight-secondary">非相干散射</span>：当$X$射线光子与原子中受核束缚较弱的电子发生碰撞时，电子被撞离原子并带走光子的部分能量而成为反冲电子，光子方向改变且能量降低，波长变长，这种散射称为非相干散射（康普顿散射）。由于非相干散射的波长和方向均发生变化，不能产生干涉，因此在衍射图谱上形成连续背底，其强度随$\frac{\sin\theta}{\lambda}$的增加而增大，对衍射分析产生干扰。</p></div>
+</div>
+<div class="principle-point-row">
+<div class="principle-point"><h4>3. $X$射线谱的分类</h4><div class="principle-point-image"><img src="../images/XRD/3.png" alt="X射线谱" style="max-height: 430px;"></div><p><span class="highlight-secondary">连续X射线谱</span>：当能量为$eU$的电子与阳极靶的原子碰撞时，电子电子减速过程中辐射出$X$射线光子。电子可能一次辐射一个光子，也可能多次碰撞辐射多个能量不同的光子，这些光子叠加形成连续谱。实验表明，连续谱的总强度为 $I_{连续} = KiZU^{2}$ 其中$U$为管电压，$i$为管流，$Z$为阳极靶材的原子序数，$K$为常数（约$1.1 \times 10^{- 9}$~$1.4 \times 10^{- 9}$）。</p><p><span class="highlight-secondary">特征X射线谱</span>：当管流不变而管压升高至某一临界值$U_{K}$时，连续谱的某些特定波长处出现强度很高的锐锋，它们构成了特征$X$射线谱。特征$X$射线谱的波长只取决于靶材原子的种类，与其他因素无关。1914年，莫塞莱发现该规律，并提出莫塞莱定律： $$\sqrt{\frac{1}{\lambda}} \propto K\left. （Z - \sigma \right.）$$ 其中$\lambda$为特征$X$射线波长，$Z$为靶材原子序数，$K$、$\sigma$为常数。</p></div>
+<div class="principle-point"><h4>4. 布拉格方程的推导</h4><div class="principle-point-image"><img src="../images/XRD/4.png" alt="布拉格方程推导" style="max-height: 425px;"></div><p><span class="highlight-main">布拉格方程推导</span>：考虑相邻两个平行晶面 $(hkl)$，相邻平行晶面的面间距为$d$。入射 $X$射线以掠射角$\theta$（入射方向与晶面的夹角）照射到晶面上，在相邻晶面上产生的反射波之间的光程差为$\delta = 2d\sin\theta$。当光程差等于入射$X$射线波长的整数倍时，反射波相位相同，发生相长干涉，即衍射条件为：$2d\sin\theta = n\lambda$，$n = 1,2,\cdots$ 其中$d$为晶面间距，$\theta$为布拉格角（掠射角，即半衍射角），$\lambda$为$X$射线波长，$n$为衍射级数。</p></div>
+</div>
+<div class="principle-point-row">
+<div class="principle-point"><h4>5. 单晶衍射方法</h4><div class="principle-point-image"><img src="../images/XRD/5.png" alt="单晶衍射方法"></div><p><span class="highlight-secondary">劳厄法</span>：采用连续 $X$ 射线照射固定不动的单晶体，利用$X$射线波长的连续性，使不同波长的射线满足不同晶面的布拉格条件而产生衍射。用垂直于入射线的平板底片记录衍图案，得到劳厄斑点。<br><span class="highlight-secondary">转晶法</span>：采用单色 $X$ 射线照射绕某一轴旋转的单晶体，并用一张以旋转轴为轴的圆筒形底片来记录衍射。转晶法的特点是入射线波长不变，而通过旋转晶体连续改变各晶面与入射线的掠射角$\theta$，以满足布拉格条件。转晶法通常选择晶体某一已知晶轴方向为旋转轴，入射$X$射线与之相垂直，衍射花样呈层线分布。转晶法可测定晶体在旋转轴方向上的点阵周期，通过多个方向的测定可确定晶体的结构。</p></div>
+<div class="principle-point"><h4>6. 多晶衍射方法</h4><div class="principle-point-image"><img src="../images/XRD/6.png" alt="多晶衍射方法"></div><p><span class="highlight-secondary">德拜-谢乐法</span>：采用细束单色 $X$ 射线垂直照射多晶粉末圆柱试样，衍射线在空间分布为以入射线为轴的一系列同轴圆锥面，其顶角为 $4\theta$。用以试样为轴线的圆筒状底片记录衍射花样，得到一组弧线对。常用德拜法相机的内径为 57.3mm 或 114.6mm。底片紧贴圆筒内壁，故底片圆环直径近似等于圆筒直径。由德拜法衍射几何图可知： $2l = 4\theta R$或$\theta = \frac{2l}{4R}(rad) = \frac{2l}{4R} \times {57.3}^{°}\ $ 其中$l$ 为底片上弧线对间距，$R$为相机半径。底片安装方式有正装法、反装法和不对称装法。</p><p><span class="highlight-secondary">衍射仪法</span>：采用单色 $X$ 射线照射多晶（粉晶）或转动的单晶试样，利用探测器和测角仪记录衍射线的强度与角度，并将信号转化为电信号进行自动记录，或通过计算机进行数据处理与分析。衍射仪主要由X射线发生器、测角仪、探测器、记录器和控制系统组成。</p></div>
+</div>
+</div>
+<h3>原理应用</h3>
+<p>基于衍射峰位与强度的关联，可用于物相鉴定、晶体结构解析、微观应力与晶粒尺寸测定等。</p>
+<div class="application-layout">
+<div class="special-application-container"><img src="../images/XRD/principle-application.png" alt="衍射谱应用"></div>
+<div class="step application-step"><p><strong>学习要点：</strong> 掌握布拉格方程 $2d\sin\theta = n\lambda$ 和结构因子 $F_{hkl}$ 的概念是核心，通过它们可解释衍射方向与强度分布，是物相分析、晶体结构测定及微观应力研究的理论基础。</p></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 操作方法：严格依照Word内容，包括按钮文字和观察要点 -->
+<div id="operation" class="content-section">
+<h2 class="section-title">操作方法</h2>
+<div class="detail-text">
+<h3>操作方法</h3>
+<div class="operation-steps-vertical">
+<div class="operation-step-vertical"><div class="operation-step-number">1</div><div class="operation-content"><p><strong>选择晶体类型：</strong>选择<span class="operation-button">“晶体类型”</span>，“$SC$”、“$BCC$”、“$FCC$”</p><div class="observation-tip"><strong>观察要点：</strong> 观察 $SC$（简单立方）、$BCC$（体心立方）、$FCC$（面心立方）三种晶体的$XRD$衍射峰数量、$2θ$位置、衍射峰的相对强度（绝对强度会因为不同仪器相差较大）等相关信息；理解结构消光规律，$SC$无消光（所有 $(hkl)$ 晶面出峰），$BCC$仅$(h+k+l)$为偶数时出峰，$FCC$仅 $(h,k,l)$全奇 / 全偶时出峰。</div></div></div>
+<div class="operation-step-vertical"><div class="operation-step-number">2</div><div class="operation-content"><p><strong>调节晶格常数：</strong>滑动<span class="operation-button">“晶格常数”</span>滑块或在矩形框输入晶格常数大小</p><div class="observation-tip"><strong>观察要点：</strong> 根据布拉格公式 \(2d·\sinθ=nλ\) ($d=$\(\frac{a}{\sqrt{h2 + k2 + l2}}\),其中$a$为晶格常数)， $a$增大→晶面间距$d$增大→$sinθ$减小→峰向低 $2θ$（左）移动；反之，$a$减小则峰向高 $2θ$（右）移动。</div></div></div>
+<div class="operation-step-vertical"><div class="operation-step-number">3</div><div class="operation-content"><p><strong>调节扫描步长:</strong> 滑动<span class="operation-button">“扫描步长”</span>滑块或在矩形框输入扫描步长大小</p><div class="observation-tip"><strong>观察要点：</strong> 观察步长（$2θ$采样间隔）对谱线平滑度、分辨率的影响，步长越小（如 0.01°）→采样点越密集→谱线越平滑，峰形细节越清晰；步长越大（如 0.05°）→采样点越稀疏→谱线越粗糙，峰形细节可能会丢失。</div></div></div>
+</div>
+<div class="step"><p><strong>操作提示：</strong> 调节晶格常数时，建议小幅度（0.01nm级）调整，直观观察峰的连续偏移，验证布拉格公式 \(2d·\sinθ=nλ\)。观察衍射峰时，结合标注的 (hkl) 晶面指数，理解晶面与衍射峰的对应关系。</p></div>
+</div>
+</div>
+
+<!-- 实验仿真部分保持不变（交互样式与功能保留） -->
+<div id="simulation" class="content-section">
+    <h2 class="section-title">实验仿真</h2>
+    <div class="mica-bottom-layout">
+        <div class="control-panel">
+            <h3>参数控制面板</h3>
+            <div class="control-group">
+                <label>1. 晶体类型：</label>
+                <div class="crystal-type-buttons" id="crystalTypeButtons">
+                    <button class="crystal-button active" data-lattice="SC">SC</button>
+                    <button class="crystal-button" data-lattice="BCC">BCC</button>
+                    <button class="crystal-button" data-lattice="FCC">FCC</button>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="dSlabSlider">2. 晶格常数 (0.3~0.5 nm):</label>
+                <div class="slider-edit-group">
+                    <div class="slider-container"><input type="range" id="dSlabSlider" min="0.3" max="0.5" value="0.4" step="0.01"></div>
+                    <div class="edit-container"><input type="number" id="dSlabEdit" value="0.4" min="0.3" max="0.5" step="0.01"></div>
+                    <span class="unit-label">nm</span>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="stepSlider">3. 扫描步长 ($2θ$ 0.01~0.05°):</label>
+                <div class="slider-edit-group">
+                    <div class="slider-container"><input type="range" id="stepSlider" min="0.01" max="0.05" value="0.01" step="0.01"></div>
+                    <div class="edit-container"><input type="number" id="stepEdit" value="0.01" min="0.01" max="0.05" step="0.01"></div>
+                    <span class="unit-label">°</span>
+                </div>
+            </div>
+            <div class="physical-notes">
+    <h4>物理现象说明</h4>
+    <ul>
+        <li><span class="highlight-important">SC</span>：晶胞仅顶点存在原子，无系统消光，所有满足布拉格条件的\((hkl)\)晶面均产生衍射</li>
+        <li><span class="highlight-important">BCC</span>：晶胞含顶点与体心原子，消光条件：\(h+k+l\)为奇数时衍射完全消失，仅\(h+k+l\)为偶数的晶面产生衍射</li>
+        <li><span class="highlight-important">FCC</span>：晶胞含顶点与面心原子，消光条件：\(h,k,l\)奇偶性混合时衍射完全消失，仅\(h,k,l\)全奇/全偶的晶面产生衍射</li>
+        <li><span class="highlight-important">谱图的绝对强度</span>：仪器直接测得到的原始积分强度（峰面积），它的数值受大量非样品本征的实验因素（仪器相关因素、样品与制样相关因素、 环境与操作因素等）影响，因此，不同仪器、不同制样、不同测试参数下的原始绝对强度，直接比较没有任何科学价值</li>
+    </ul>
+</div>
+        </div>
+        <div class="display-panel">
+            <div class="canvas-container">
+                <h3 id="xrdTitle">XRD衍射图谱显示</h3>
+                <div class="chart-container"><canvas id="xrdCanvas"></canvas></div>
+                <div class="math-formula">$$2d·\sin\theta = n\lambda \quad (n=1, \lambda=0.15406\ \text{nm})$$</div>
+            </div>
+            <div class="current-params-below">
+                <h4>当前实验参数</h4>
+                <p id="currentParamsText">晶体类型: SC | 晶格常数: 0.40 nm | 扫描步长: 0.01° | 扫描范围: 10°~80°2θ</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="footer"></div>
+</div>
+
+<script>
+function scrollToSection(sectionId) {
+    const element = document.getElementById(sectionId);
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        updateNavActiveState(sectionId);
+    }
+}
+
+function updateNavActiveState(sectionId) {
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => item.classList.remove('active'));
+    // 注意索引：第一个是返回首页，后面依次是背景、原理、操作、仿真，对应索引1-4
+    const navMap = { 'definition': 1, 'principle': 2, 'operation': 3, 'simulation': 4 };
+    if (navMap[sectionId] !== undefined) navItems[navMap[sectionId]].classList.add('active');
+}
+
+function createStarParticles() {
+    const container = document.getElementById('starParticles');
+    if (!container) return;
+    const particleCount = 40;
+    for (let i = 0; i < particleCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'star-particle';
+        const x = Math.random() * 100;
+        const y = Math.random() * 100;
+        const size = Math.random() * 3 + 1;
+        const delay = Math.random() * 5;
+        const duration = Math.random() * 10 + 10;
+        star.style.left = `${x}vw`;
+        star.style.top = `${y}vh`;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.animation = `particleFloat ${duration}s ${delay}s infinite linear`;
+        container.appendChild(star);
+    }
+}
+const styleSheet = document.createElement('style');
+styleSheet.textContent = `
+@keyframes particleFloat {
+0% { transform: translateY(0) translateX(0); opacity: 0; }
+10% { opacity: 0.7; }
+90% { opacity: 0.7; }
+100% { transform: translateY(-100vh) translateX(${Math.random() * 100 - 50}px); opacity: 0; }
+}
+`;
+document.head.appendChild(styleSheet);
+
+function handleScroll() {
+    const sections = ['definition', 'principle', 'operation', 'simulation'];
+    const scrollPosition = window.scrollY + 100;
+    for (let i = sections.length - 1; i >= 0; i--) {
+        const section = document.getElementById(sections[i]);
+        if (section && section.offsetTop <= scrollPosition) {
+            updateNavActiveState(sections[i]);
+            break;
+        }
+    }
+}
+
+window.addEventListener('scroll', handleScroll);
+
+// ==================== XRD 仿真核心脚本 ====================
+(function initXRD() {
+    const LAMBDA = 0.15406, N = 1, SCAN_MIN = 10, SCAN_MAX = 80;
+    let currentD = 0.4, currentStep = 0.01, currentLattice = "SC";
+    const xrdCanvas = document.getElementById('xrdCanvas');
+    if (!xrdCanvas) return;
+    const xrdCtx = xrdCanvas.getContext('2d');
+    const currentParamsText = document.getElementById('currentParamsText');
+    const crystalButtons = document.querySelectorAll('.crystal-button');
+
+    const latticeData = {
+        SC: [{hkl:[1,0,0],i:100},{hkl:[1,1,0],i:80},{hkl:[1,1,1],i:60},{hkl:[2,0,0],i:40},{hkl:[2,1,0],i:30},{hkl:[2,1,1],i:20},{hkl:[2,2,0],i:15},{hkl:[2,2,1],i:10}],
+        BCC: [{hkl:[1,1,0],i:100},{hkl:[2,0,0],i:40},{hkl:[2,1,1],i:20},{hkl:[2,2,0],i:15},{hkl:[3,1,0],i:10},{hkl:[2,2,2],i:8},{hkl:[3,2,1],i:5}],
+        FCC: [{hkl:[1,1,1],i:100},{hkl:[2,0,0],i:40},{hkl:[2,2,0],i:20},{hkl:[3,1,1],i:15},{hkl:[2,2,2],i:10},{hkl:[4,0,0],i:5}]
+    };
+
+    const calcDForHKL = (hkl, baseD) => baseD / Math.sqrt(hkl[0]**2 + hkl[1]**2 + hkl[2]**2);
+    const calc2Theta = (d) => {
+        const sinTheta = (N * LAMBDA) / (2 * d);
+        if (sinTheta > 1 || sinTheta < 0) return -1;
+        return 2 * (Math.asin(sinTheta) * 180 / Math.PI);
+    };
+    const gauss = (x, mu, sigma, A) => A * Math.exp(-Math.pow((x - mu)/sigma,2)/2);
+
+    const drawXRDChart = () => {
+        const container = xrdCanvas.parentElement;
+        if (!container || !container.getBoundingClientRect().width) return;
+        xrdCanvas.width = container.clientWidth;
+        xrdCanvas.height = container.clientHeight;
+        const w = xrdCanvas.width, h = xrdCanvas.height, ctx = xrdCtx;
+        ctx.fillStyle = 'rgba(5, 10, 25, 0.95)';
+        ctx.fillRect(0,0,w,h);
+
+        const validPeaks = latticeData[currentLattice].map(p => ({
+            twoTheta: calc2Theta(calcDForHKL(p.hkl, currentD)),
+            intensity: p.i,
+            hkl: p.hkl
+        })).filter(p => p.twoTheta > SCAN_MIN && p.twoTheta < SCAN_MAX);
+
+        const peakSigma = currentStep *5 +0.3, xStart = w*0.1, xEnd = w*0.95, yStart = h*0.9, yEnd = h*0.1;
+        const xScale = (xEnd - xStart)/(SCAN_MAX - SCAN_MIN), yScale = (yEnd - yStart)/1000;
+
+        ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+        ctx.lineWidth = 2;
+        [[xStart,yStart,xEnd,yStart], [xStart,yStart,xStart,yEnd], [xStart,yEnd,xEnd,yEnd], [xEnd,yStart,xEnd,yEnd]].forEach(([x1,y1,x2,y2]) => {
+            ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+        });
+
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('2θ (deg)', xEnd -255, yStart +40);
+        ctx.save();
+        ctx.translate(xStart -20, (yStart + yEnd)/2);
+        ctx.rotate(-Math.PI/2);
+        ctx.fillText('XRD Intensity(a.u.)', 0,0);
+        ctx.restore();
+
+        for (let x=SCAN_MIN; x<=SCAN_MAX; x+=10) {
+            const xPos = xStart + (x - SCAN_MIN)*xScale;
+            ctx.beginPath(); ctx.moveTo(xPos,yStart); ctx.lineTo(xPos,yStart+10); ctx.stroke();
+            ctx.fillText(x.toString(), xPos, yStart+25);
+        }
+
+        ctx.beginPath();
+        ctx.strokeStyle = '#66ccff';
+        ctx.lineWidth = 2;
+        let firstPoint = true;
+        for (let twoTheta=SCAN_MIN; twoTheta<=SCAN_MAX; twoTheta+=currentStep) {
+            const xPos = xStart + (twoTheta - SCAN_MIN)*xScale;
+            let intensity = 0;
+            validPeaks.forEach(p => intensity += gauss(twoTheta, p.twoTheta, peakSigma, p.intensity*8));
+            const yPos = yStart + intensity * yScale;
+            if(firstPoint) { ctx.moveTo(xPos,yPos); firstPoint=false; } else ctx.lineTo(xPos,yPos);
+        }
+        ctx.stroke();
+
+        ctx.font = '12px Microsoft YaHei';
+        validPeaks.forEach(p => {
+            if (p.twoTheta > SCAN_MIN && p.twoTheta < SCAN_MAX) {
+                const peakX = xStart + (p.twoTheta - SCAN_MIN)*xScale;
+                const peakY = yStart + gauss(p.twoTheta, p.twoTheta, peakSigma, p.intensity*8)*yScale;
+                ctx.fillStyle = '#ff6666';
+                ctx.fillText(`(${p.hkl.join('')}) ${p.twoTheta.toFixed(1)}°`, peakX, peakY-10);
+            }
+        });
+    };
+
+    const updateSimulation = () => {
+        currentParamsText.innerHTML = `晶体类型: ${currentLattice} | 晶格常数: ${currentD.toFixed(2)} nm | 扫描步长: ${currentStep.toFixed(2)}° | 扫描范围: ${SCAN_MIN}°~${SCAN_MAX}°2θ`;
+        drawXRDChart();
+        if (window.MathJax) MathJax.typesetPromise?.();
+    };
+
+    const setActiveCrystalButton = (lattice) => {
+        crystalButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.lattice === lattice));
+        currentLattice = lattice;
+        updateSimulation();
+    };
+
+    const bindSlider = (sliderId, editId, min, max, step, callback) => {
+        const slider = document.getElementById(sliderId), edit = document.getElementById(editId);
+        if(!slider || !edit) return;
+        slider.addEventListener('input', () => {
+            const val = parseFloat(slider.value);
+            edit.value = val.toFixed(step<0.1?2:0);
+            callback(val);
+        });
+        edit.addEventListener('change', () => {
+            let val = parseFloat(edit.value);
+            if (isNaN(val)) val = parseFloat(slider.value);
+            else val = Math.max(min, Math.min(max, val));
+            slider.value = val;
+            edit.value = val.toFixed(step<0.1?2:0);
+            callback(val);
+        });
+    };
+
+    crystalButtons.forEach(btn => btn.addEventListener('click', () => setActiveCrystalButton(btn.dataset.lattice)));
+    bindSlider('dSlabSlider', 'dSlabEdit', 0.3, 0.5, 0.01, val => { currentD = val; updateSimulation(); });
+    bindSlider('stepSlider', 'stepEdit', 0.01, 0.05, 0.01, val => { currentStep = val; updateSimulation(); });
+    window.addEventListener('resize', () => drawXRDChart());
+    setActiveCrystalButton('SC');
+})();
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStarParticles();
+    setTimeout(() => handleScroll(), 100);
+});
+</script>
+</body>
+</html>

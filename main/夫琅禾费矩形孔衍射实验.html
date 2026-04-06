@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>夫琅禾费矩形孔衍射</title>
+    <script id="MathJax-script" async src="../es5/tex-mml-svg.js"></script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI','Microsoft YaHei',sans-serif;}
+        body{background:radial-gradient(circle at 10% 20%,rgba(20,30,80,0.8) 0%,transparent 30%),radial-gradient(circle at 90% 30%,rgba(40,20,90,0.7) 0%,transparent 40%),radial-gradient(circle at 50% 80%,rgba(30,40,100,0.6) 0%,transparent 35%),linear-gradient(to bottom,#0a0e2a,#1a1f3a,#2d3250);color:#e0e0ff;line-height:1.6;min-height:100vh;background-attachment:fixed;position:relative;overflow-x:hidden;animation:skyMove 30s infinite alternate ease-in-out;padding-top:70px;}
+        @keyframes skyMove{0%{background-position:0% 0%,100% 0%,50% 100%;}100%{background-position:10% 20%,90% 30%,50% 80%;}}
+        body::before,body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-repeat:repeat;z-index:-1;}
+        body::before{background-image:radial-gradient(2px 2px at 20px 30px,#eee,transparent),radial-gradient(2px 2px at 40px 70px,#fff,transparent),radial-gradient(3px 3px at 120px 180px,#ddd,transparent),radial-gradient(2px 2px at 200px 150px,#fff,transparent),radial-gradient(1px 1px at 300px 80px,#eee,transparent),radial-gradient(2px 2px at 350px 200px,#ddd,transparent),radial-gradient(3px 3px at 450px 120px,#fff,transparent),radial-gradient(1px 1px at 500px 250px,#eee,transparent),radial-gradient(2px 2px at 600px 100px,#ddd,transparent);animation:twinkle 8s infinite alternate,starsMove 20s infinite linear;opacity:0.7;}
+        body::after{background-image:radial-gradient(1px 1px at 80px 120px,#bbf,transparent),radial-gradient(2px 2px at 150px 200px,#ccf,transparent),radial-gradient(1px 1px at 250px 80px,#aaf,transparent),radial-gradient(2px 2px at 320px 280px,#ddf,transparent),radial-gradient(1px 1px at 420px 150px,#bbf,transparent),radial-gradient(2px 2px at 500px 320px,#ccf,transparent);animation:twinkle2 5s infinite alternate,starsMove2 25s infinite linear reverse;opacity:0.5;}
+        @keyframes twinkle{0%,100%{opacity:0.5;}50%{opacity:0.9;}}
+        @keyframes twinkle2{0%,100%{opacity:0.3;}50%{opacity:0.7;}}
+        @keyframes starsMove{0%{background-position:0 0;}100%{background-position:200px 100px;}}
+        @keyframes starsMove2{0%{background-position:0 0;}100%{background-position:-150px -80px;}}
+        .star-particle{position:fixed;width:2px;height:2px;background:#fff;border-radius:50%;box-shadow:0 0 5px 1px rgba(255,255,255,0.8);z-index:-1;opacity:0;}
+
+        /* ========== 新增：返回首页导航栏样式 ========== */
+        .nav-container {
+            background-color: rgba(20,25,50,0.95);
+            border-radius: 0 0 12px 12px;
+            padding: 15px 30px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-top: none;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            animation: navFloat 8s ease-in-out infinite;
+        }
+        @keyframes navFloat {
+            0%,100%{transform:translateY(0px);}
+            50%{transform:translateY(-3px);}
+        }
+        .nav-list {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .nav-item {
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(63,81,181,0.3), rgba(30,34,60,0.8));
+            border: 1px solid rgba(100,120,255,0.3);
+        }
+        .nav-item:hover {
+            background: linear-gradient(135deg, rgba(80,100,220,0.5), rgba(50,54,85,0.9));
+            transform: translateY(-3px);
+            border-color: rgba(100,120,255,0.6);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(63,81,181,0.7), rgba(40,45,80,0.9));
+            border-color: rgba(100,120,255,0.8);
+        }
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .nav-item:nth-child(1) .nav-dot { background-color: #bf2ee7; }
+
+        /* 最大父容器样式（完整保留并确保生效） */
+        .main-container{max-width:1200px;margin:0 auto;padding:20px;position:relative;z-index:1;}
+        .main-title{text-align:center;font-size:2.8rem;color:#fff;margin-bottom:30px;padding-bottom:15px;border-bottom:2px solid #3f51b5;text-shadow:0 0 15px rgba(63,81,181,0.7);letter-spacing:1px;animation:titleGlow 4s ease-in-out infinite;font-weight:700;}
+        @keyframes titleGlow{0%,100%{text-shadow:0 0 15px rgba(63,81,181,0.7);}50%{text-shadow:0 0 25px rgba(63,81,181,0.9),0 0 35px rgba(63,81,181,0.6);}}
+        .simulation-section{background-color:rgba(255,255,255,0.08);border-radius:15px;padding:30px;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);margin-bottom:40px;box-shadow:0 10px 30px rgba(0,0,0,0.4);}
+        .simulation-section h2{text-align:left;font-size:2.2rem;color:#fff;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid #3f51b5;text-shadow:0 0 10px rgba(63,81,181,0.5);font-weight:600;}
+        .simulation-layout{display:flex;flex-wrap:wrap;gap:30px;margin-top:20px;}
+        .control-panel{flex:1;min-width:320px;background:linear-gradient(135deg,rgba(20,25,50,0.95),rgba(30,35,65,0.9));padding:30px 25px;border-radius:12px;border:1px solid rgba(63,81,181,0.4);box-shadow:0 6px 20px rgba(0,0,0,0.4);display:flex;flex-direction:column;min-height:620px;}
+        .control-panel h3{color:#fff;margin-bottom:20px;font-size:1.6rem;border-bottom:2px solid rgba(63,81,181,0.8);padding-bottom:10px;font-weight:70;text-align:center;}
+        .control-group{margin-bottom:25px;padding-bottom:15px;border-bottom:1px solid rgba(255,255,255,0.1);width:100%;}
+        .control-group label{display:block;color:#e0e0ff;margin-bottom:8px;font-weight:600;font-size:1.1rem;}
+        .slider-edit-group{display:flex;align-items:center;gap:12px;margin-bottom:5px;width:100%;}
+        .slider-container{flex:1;min-width:0;}
+        .slider-edit-group input[type="range"]{width:100%;height:10px;-webkit-appearance:none;background:linear-gradient(to right,rgba(30,35,60,0.8),rgba(63,81,181,0.8));border-radius:5px;outline:none;}
+        .slider-edit-group input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#3f51b5,#667eea);cursor:pointer;box-shadow:0 0 12px rgba(63,81,181,0.9);border:2px solid #fff;transition:all .2s;}
+        .slider-edit-group input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.1);}
+        .edit-container{width:90px;flex-shrink:0;}
+        .slider-edit-group input[type="number"]{width:100%;padding:8px 10px;border-radius:6px;background:rgba(15,20,45,0.9);border:1px solid rgba(63,81,181,0.6);color:#fff;font-size:.95rem;font-weight:500;text-align:center;}
+        .slider-edit-group input[type="number"]:focus{outline:none;border-color:#3f51b5;box-shadow:0 0 0 3px rgba(63,81,181,0.3);}
+        .unit-span{width:40px;color:#e0e0ff;font-size:1rem;}
+        .button-group{display:flex;gap:15px;margin-top:30px;width:100%;}
+        .sim-button{flex:1;padding:12px 10px;border-radius:8px;border:none;font-weight:700;cursor:pointer;transition:all .3s;font-size:1.1rem;text-align:center;letter-spacing:.5px;color:#fff;}
+        .reset-btn{background:linear-gradient(135deg,#f06292,#ec407a);box-shadow:0 4px 12px rgba(240,98,146,0.4);border:1px solid rgba(240,98,146,0.8);}
+        .reset-btn:hover{background:linear-gradient(135deg,#ec407a,#f06292);transform:translateY(-3px);box-shadow:0 6px 18px rgba(240,98,146,0.6);}
+        
+        /* 当前参数样式（与双缝干涉实验一致） */
+        .current-params-below {
+            margin-top: 20px;
+            padding: 12px;
+            background: rgba(15, 20, 45, 0.7);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            text-align: center;
+        }
+        .current-params-below h4 {
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .current-params-below p {
+            color: #d0d5ff;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin: 5 0;
+        }
+        
+        .physical-notes {
+            margin-top: 25px;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(30, 35, 60, 0.9), rgba(40, 45, 75, 0.8));
+            border-radius: 12px;
+            border-left: 4px solid #4caf50;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        .physical-notes h4 {
+            color: #ffffff;
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            text-align: center;
+            border-bottom: 2px solid rgba(76, 175, 80, 0.7);
+            padding-bottom: 8px;
+        }
+        .physical-notes ul {
+            color: #d0d5ff;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            padding-left: 20px;
+            list-style-type: disc;
+        }
+        .physical-notes li {
+            margin-bottom: 8px;
+        }
+        .highlight-important {
+            background-color: rgba(100, 200, 255, 0.4);
+            color: #e0f0ff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            border: 1px solid rgba(100, 200, 255, 0.7);
+            display: inline;
+            white-space: normal;
+            word-break: keep-all;
+        }
+        .display-panel{flex:2;min-width:600px;background:linear-gradient(135deg,rgba(20,25,50,0.95),rgba(30,35,65,0.9));padding:25px;border-radius:12px;border:1px solid rgba(76,175,80,0.4);box-shadow:0 6px 20px rgba(0,0,0,0.4);display:flex;flex-direction:column;gap:20px;}
+        .canvas-container{background:rgba(10,15,35,0.95);border-radius:10px;padding:15px;border:2px solid rgba(63,81,181,0.5);box-shadow:0 4px 15px rgba(0,0,0,0.3);}
+        .canvas-container h3{color:#fff;margin-bottom:12px;font-size:1.3rem;text-align:center;font-weight:600;border-bottom:2px solid rgba(76,175,80,0.7);padding-bottom:8px;}
+        .chart-container{position:relative;width:100%;background:#000;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);}
+        canvas{width:100%;height:auto;display:block;}
+        .formula-note{color:#7f92d9;font-size:.9rem;margin-top:8px;text-align:center;background:rgba(63,81,181,0.2);padding:5px 10px;border-radius:20px;}
+        .footer{text-align:center;margin-top:40px;color:#a0a5ff;font-size:1rem;padding:20px;border-top:1px solid rgba(255,255,255,0.15);opacity:0.9;}
+        .math, mjx-container{color:#66ccff !important;}
+    </style>
+</head>
+<body>
+<div id="starParticles"></div>
+
+<!-- 新增：返回首页导航栏 -->
+<div class="nav-container">
+    <ul class="nav-list">
+        <li class="nav-item active" onclick="window.location.href='../index.html'">
+            <div class="nav-dot"></div>
+            <span>返回首页</span>
+        </li>
+    </ul>
+</div>
+
+<!-- 最大父容器，已应用对应样式 -->
+<div class="main-container">
+    <h1 class="main-title">夫琅禾费矩孔衍射</h1>
+    <div id="simulation" class="simulation-section">
+        <h2 class="section-title">实验仿真</h2>
+        <div class="simulation-layout">
+            <div class="control-panel">
+                <h3>参数控制面板</h3>
+                <div class="control-group"><label>1. 孔宽 \(a\) (0.05 ~ 0.8 mm)：</label><div class="slider-edit-group"><div class="slider-container"><input type="range" id="sliderA" min="0.05" max="0.8" step="0.001" value="0.20"></div><div class="edit-container"><input type="number" id="editA" value="0.20" min="0.05" max="0.8" step="0.001"></div><span class="unit-span">mm</span></div></div>
+                <div class="control-group"><label>2. 孔高 \(b\) (0.05 ~ 0.8 mm)：</label><div class="slider-edit-group"><div class="slider-container"><input type="range" id="sliderB" min="0.05" max="0.8" step="0.001" value="0.30"></div><div class="edit-container"><input type="number" id="editB" value="0.30" min="0.05" max="0.8" step="0.001"></div><span class="unit-span">mm</span></div></div>
+                <div class="control-group"><label>3. 入射光波长 \(λ\) (400 ~ 700 nm)：</label><div class="slider-edit-group"><div class="slider-container"><input type="range" id="sliderLambda" min="400" max="700" step="1" value="550"></div><div class="edit-container"><input type="number" id="editLambda" value="550" min="400" max="700" step="1"></div><span class="unit-span">nm</span></div></div>
+                <div class="control-group"><label>4. 焦距 \(f\) (200 ~ 1000 mm)：</label><div class="slider-edit-group"><div class="slider-container"><input type="range" id="sliderF" min="200" max="1000" step="1" value="500"></div><div class="edit-container"><input type="number" id="editF" value="500" min="200" max="1000" step="1"></div><span class="unit-span">mm</span></div></div>
+                <div class="button-group"><button id="resetParamsBtn" class="sim-button reset-btn">重置默认参数</button></div>
+                
+                <!-- 物理现象说明区域 -->
+                <div class="physical-notes">
+                    <h4>物理实验现象说明</h4>
+                    <ul>
+                        <li><span class="highlight-important">固定显示范围</span>: ±6 mm (水平) / 按比例自适应垂直</li>
+                        <li><span class="highlight-important">第一暗纹</span>: \(x₁\) = <span id="x1Val">2.20</span> mm, \(y₁\)= <span id="y1Val">1.47</span> mm</li>
+                        <li><span class="highlight-important">a=b</span> → 中央亮斑为正方形，红色和绿色强度曲线重合</li>
+                        <li><span class="highlight-important">波长改变</span> → 仅条纹变色，背景纯黑，暗部平滑衰减，中央亮度降低</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="display-panel">
+                <div class="canvas-container"><h3>二维衍射图样 </h3><div class="chart-container"><canvas id="canvas2d" width="700" height="450" style="width:100%; height:auto;"></canvas></div></div>
+                <div class="canvas-container"><h3>一维强度曲线 </h3><div class="chart-container"><canvas id="canvas1d" width="700" height="300" style="width:100%; height:auto;"></canvas></div></div>
+            <div class="current-params-below">
+                    <h4>当前参数</h4>
+                    <p id="currentParamsText">孔宽: 0.20 mm | 孔高: 0.30 mm | 波长: 550 nm | 焦距: 500 mm</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+(function(){
+    // 星光粒子效果
+    const starContainer = document.getElementById('starParticles');
+    if(starContainer){
+        for(let i=0;i<60;i++){
+            let s=document.createElement('div');
+            s.className='star-particle';
+            s.style.left=Math.random()*100+'vw';
+            s.style.top=Math.random()*100+'vh';
+            let sz=Math.random()*3+1;
+            s.style.width=sz+'px'; s.style.height=sz+'px';
+            s.style.animation=`particleFloat ${Math.random()*15+12}s ${Math.random()*8}s infinite linear`;
+            starContainer.appendChild(s);
+        }
+    }
+    const sty=document.createElement('style');
+    sty.textContent=`@keyframes particleFloat{0%{transform:translateY(0) translateX(0);opacity:0;}15%{opacity:0.7;}85%{opacity:0.7;}100%{transform:translateY(-100vh) translateX(${Math.random()*80-40}px);opacity:0;}}`;
+    document.head.appendChild(sty);
+})();
+
+(function(){
+    const sliderA=document.getElementById('sliderA'), editA=document.getElementById('editA');
+    const sliderB=document.getElementById('sliderB'), editB=document.getElementById('editB');
+    const sliderLambda=document.getElementById('sliderLambda'), editLambda=document.getElementById('editLambda');
+    const sliderF=document.getElementById('sliderF'), editF=document.getElementById('editF');
+    const resetBtn=document.getElementById('resetParamsBtn');
+    const x1Span=document.getElementById('x1Val'), y1Span=document.getElementById('y1Val');
+    const canvas2d=document.getElementById('canvas2d'), canvas1d=document.getElementById('canvas1d');
+    const ctx2d=canvas2d.getContext('2d'), ctx1d=canvas1d.getContext('2d');
+    const currentParamsText = document.getElementById('currentParamsText');
+    const FIXED_RANGE_MM=6.0, range_m=FIXED_RANGE_MM*1e-3;
+    const DEFAULTS={a:0.20,b:0.30,lambda:550,f:500};
+    sliderA.value=DEFAULTS.a; editA.value=DEFAULTS.a;
+    sliderB.value=DEFAULTS.b; editB.value=DEFAULTS.b;
+    sliderLambda.value=DEFAULTS.lambda; editLambda.value=DEFAULTS.lambda;
+    sliderF.value=DEFAULTS.f; editF.value=DEFAULTS.f;
+
+    const sinc=x=>Math.abs(x)<1e-12?1:Math.sin(Math.PI*x)/(Math.PI*x);
+    const getColor=(lambda_nm,intensity)=>{
+        let I=Math.pow(intensity,2.5);
+        let t=(lambda_nm-400)/300;
+        let H=0.75*(1-t);
+        let S=0.9, L=I*0.85;
+        L=Math.min(1,Math.max(0,L));
+        const hue2rgb=(p,q,t)=>{if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p;};
+        let q=L<0.5?L*(1+S):L+S-L*S;
+        let p=2*L-q;
+        let r=hue2rgb(p,q,H+1/3), g=hue2rgb(p,q,H), b=hue2rgb(p,q,H-1/3);
+        return {r:Math.floor(r*255),g:Math.floor(g*255),b:Math.floor(b*255)};
+    };
+    function bindSliderEdit(slider,edit,min,max,step,cb){
+        const upd=()=>{let v=parseFloat(slider.value);if(isNaN(v))v=min;edit.value=step<0.1?v.toFixed(3):(step<1?v.toFixed(2):v.toFixed(0));cb();};
+        const upE=()=>{let v=parseFloat(edit.value);if(isNaN(v))v=min;v=Math.min(max,Math.max(min,v));slider.value=v;edit.value=step<0.1?v.toFixed(3):(step<1?v.toFixed(2):v.toFixed(0));cb();};
+        slider.addEventListener('input',upd); edit.addEventListener('change',upE); upd();
+    }
+    function updateAll(){
+        try{
+            let a_mm=parseFloat(sliderA.value), b_mm=parseFloat(sliderB.value), lambda_nm=parseFloat(sliderLambda.value), f_mm=parseFloat(sliderF.value);
+            const a=a_mm*1e-3, b=b_mm*1e-3, lambda=lambda_nm*1e-9, f=f_mm*1e-3;
+            const x1=lambda*f/a, y1=lambda*f/b;
+            const x1_mm=x1*1e3, y1_mm=y1*1e3;
+            x1Span.textContent=x1_mm.toFixed(2); y1Span.textContent=y1_mm.toFixed(2);
+            
+            // 更新当前参数显示
+            currentParamsText.innerHTML = `孔宽: ${a_mm.toFixed(3)} mm | 孔高: ${b_mm.toFixed(3)} mm | 波长: ${lambda_nm} nm | 焦距: ${f_mm} mm`;
+            
+            const ax=a/(lambda*f), by=b/(lambda*f);
+            // 2D 衍射图样绘制
+            const w2=canvas2d.width, h2=canvas2d.height;
+            const imgData=ctx2d.createImageData(w2,h2), data=imgData.data;
+            const y_range_m=(h2/w2)*range_m;
+            for(let j=0;j<h2;j++){
+                const yPhys=(j/(h2-1)-0.5)*2*y_range_m;
+                const Iy=sinc(by*yPhys)**2;
+                for(let i=0;i<w2;i++){
+                    const xPhys=(i/(w2-1)-0.5)*2*range_m;
+                    const Ix=sinc(ax*xPhys)**2;
+                    const I_raw=Ix*Iy;
+                    const idx=(i+j*w2)*4;
+                    if(I_raw<1e-8){data[idx]=data[idx+1]=data[idx+2]=0;}
+                    else{
+                        let Ilog=Math.log10(I_raw+1e-6);
+                        let gray=(Ilog+5)/5;
+                        gray=Math.min(1,Math.max(0,gray));
+                        const col=getColor(lambda_nm,gray);
+                        data[idx]=col.r; data[idx+1]=col.g; data[idx+2]=col.b;
+                    }
+                    data[idx+3]=255;
+                }
+            }
+            ctx2d.putImageData(imgData,0,0);
+            ctx2d.save();
+            ctx2d.strokeStyle='#fff'; ctx2d.lineWidth=1.5; ctx2d.fillStyle='#fff'; ctx2d.font='bold 14px "Segoe UI"';
+            const cx=w2/2, cy=h2/2, axLen=280, ayLen=200, ar=8;
+            ctx2d.beginPath(); ctx2d.moveTo(cx-axLen,cy); ctx2d.lineTo(cx+axLen,cy); ctx2d.stroke();
+            ctx2d.beginPath(); ctx2d.moveTo(cx+axLen-ar,cy-ar/2); ctx2d.lineTo(cx+axLen,cy); ctx2d.lineTo(cx+axLen-ar,cy+ar/2); ctx2d.fill();
+            ctx2d.beginPath(); ctx2d.moveTo(cx,cy-ayLen); ctx2d.lineTo(cx,cy+ayLen); ctx2d.stroke();
+            ctx2d.beginPath(); ctx2d.moveTo(cx-ar/2,cy-ayLen+ar); ctx2d.lineTo(cx,cy-ayLen); ctx2d.lineTo(cx+ar/2,cy-ayLen+ar); ctx2d.fill();
+            ctx2d.font='bold 16px "Segoe UI"'; ctx2d.fillText('x',cx+axLen+5,cy-5); ctx2d.fillText('y',cx+10,cy-ayLen-5);
+            ctx2d.restore();
+            
+            // ---------- 1D强度曲线 (无刻度，仅保留坐标轴、箭头、曲线和标签) ----------
+            const w1=canvas1d.width, h1=canvas1d.height;
+            ctx1d.clearRect(0,0,w1,h1); 
+            ctx1d.fillStyle='#0b0f1c'; 
+            ctx1d.fillRect(0,0,w1,h1);
+            const margin={top:30,bottom:45,left:60,right:25}, gw=w1-margin.left-margin.right, gh=h1-margin.top-margin.bottom;
+            const N=3000, xVals=new Array(N), IxVals=new Array(N), IyVals=new Array(N);
+            for(let i=0;i<N;i++){
+                let x=-range_m+(2*range_m*i)/(N-1);
+                xVals[i]=x;
+                IxVals[i]=sinc(ax*x)**2;
+                IyVals[i]=sinc(by*x)**2;
+            }
+            let maxI=0; for(let i=0;i<N;i++) maxI=Math.max(maxI,IxVals[i],IyVals[i]);
+            if(maxI<1e-6) maxI=1;
+            for(let i=0;i<N;i++){ IxVals[i]/=maxI; IyVals[i]/=maxI; }
+            
+            // 坐标轴颜色（与轴线颜色一致）
+            const axisColor = '#5f7aff';
+            // 绘制轴线
+            ctx1d.strokeStyle=axisColor; 
+            ctx1d.lineWidth=2.5;
+            ctx1d.beginPath(); 
+            ctx1d.moveTo(margin.left,h1-margin.bottom); 
+            ctx1d.lineTo(w1-margin.right,h1-margin.bottom);  // X轴
+            ctx1d.moveTo(margin.left,margin.top); 
+            ctx1d.lineTo(margin.left,h1-margin.bottom);      // Y轴
+            ctx1d.stroke();
+            
+            // ----- 添加与坐标轴同色的小箭头 (X轴向右，Y轴向上) -----
+            const xArrowSize = 10;
+            const xAxisEndX = w1 - margin.right;
+            const xAxisEndY = h1 - margin.bottom;
+            ctx1d.fillStyle = axisColor;
+            ctx1d.beginPath();
+            ctx1d.moveTo(xAxisEndX - xArrowSize, xAxisEndY - xArrowSize/2);
+            ctx1d.lineTo(xAxisEndX, xAxisEndY);
+            ctx1d.lineTo(xAxisEndX - xArrowSize, xAxisEndY + xArrowSize/2);
+            ctx1d.fill();
+            
+            const yArrowSize = 10;
+            const yAxisEndX = margin.left;
+            const yAxisEndY = margin.top;
+            ctx1d.beginPath();
+            ctx1d.moveTo(yAxisEndX - yArrowSize/2, yAxisEndY + yArrowSize);
+            ctx1d.lineTo(yAxisEndX, yAxisEndY);
+            ctx1d.lineTo(yAxisEndX + yArrowSize/2, yAxisEndY + yArrowSize);
+            ctx1d.fill();
+            
+            // 绘制水平强度曲线 (红色)
+            ctx1d.beginPath(); 
+            ctx1d.strokeStyle='#ff6666'; 
+            ctx1d.lineWidth=2.5;
+            for(let i=0;i<N;i++){ 
+                let xp=margin.left+(xVals[i]+range_m)/(2*range_m)*gw, 
+                    yp=h1-margin.bottom-IxVals[i]*gh; 
+                if(i===0) ctx1d.moveTo(xp,yp); 
+                else ctx1d.lineTo(xp,yp); 
+            } 
+            ctx1d.stroke();
+            
+            // 绘制垂直强度曲线 (绿色)
+            ctx1d.beginPath(); 
+            ctx1d.strokeStyle='#88ff88'; 
+            ctx1d.lineWidth=2.5;
+            for(let i=0;i<N;i++){ 
+                let xp=margin.left+(xVals[i]+range_m)/(2*range_m)*gw, 
+                    yp=h1-margin.bottom-IyVals[i]*gh; 
+                if(i===0) ctx1d.moveTo(xp,yp); 
+                else ctx1d.lineTo(xp,yp); 
+            } 
+            ctx1d.stroke();
+            
+            // 轴标签与文字
+            ctx1d.fillStyle='#ccd9ff'; 
+            ctx1d.font='14px "Segoe UI"'; 
+            ctx1d.textAlign='center'; 
+            ctx1d.fillText('位置 (mm)',w1-margin.right-30,h1-margin.bottom+30);
+            ctx1d.save(); 
+            ctx1d.translate(30,h1/2); 
+            ctx1d.rotate(-Math.PI/2); 
+            ctx1d.fillText('相对强度',0,0); 
+            ctx1d.restore();
+            
+            // 图例及暗纹标注
+            ctx1d.fillStyle='#ff6666'; 
+            ctx1d.font='bold 14px "Segoe UI"'; 
+            ctx1d.fillText('水平',w1-170,margin.top+25);
+            ctx1d.fillStyle='#88ff88'; 
+            ctx1d.font='bold 14px "Segoe UI"'; 
+            ctx1d.fillText('垂直',w1-170,margin.top+50);
+            ctx1d.fillStyle='#ff8888'; 
+            ctx1d.font='12px monospace'; 
+            ctx1d.fillText(`x₁=${x1_mm.toFixed(2)}`,margin.left+540,margin.top+23);
+            ctx1d.fillStyle='#88ff88'; 
+            ctx1d.font='12px monospace'; 
+            ctx1d.fillText(`y₁=${y1_mm.toFixed(2)}`,margin.left+540,margin.top+47);
+            
+            // 刻度已完全移除，保持坐标轴干净
+        }catch(e){console.error(e);}
+    }
+    function resetDefault(){ sliderA.value=DEFAULTS.a; editA.value=DEFAULTS.a; sliderB.value=DEFAULTS.b; editB.value=DEFAULTS.b; sliderLambda.value=DEFAULTS.lambda; editLambda.value=DEFAULTS.lambda; sliderF.value=DEFAULTS.f; editF.value=DEFAULTS.f; updateAll(); }
+    bindSliderEdit(sliderA,editA,0.05,0.8,0.001,updateAll);
+    bindSliderEdit(sliderB,editB,0.05,0.8,0.001,updateAll);
+    bindSliderEdit(sliderLambda,editLambda,400,700,1,updateAll);
+    bindSliderEdit(sliderF,editF,200,1000,1,updateAll);
+    resetBtn.addEventListener('click',resetDefault);
+    window.addEventListener('resize',updateAll);
+    updateAll();
+})();
+</script>
+</body>
+</html>
